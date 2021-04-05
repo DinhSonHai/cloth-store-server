@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-process.env['NODE_CONFIG_DIR'] = __dirname;
 const config = require('config');
 const db = config.get('mongoDBLocalURL');
 
