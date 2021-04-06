@@ -28,6 +28,19 @@ class AuthController {
         return res.status(400).json({ errors: [{ message: 'This email has already signed up' }]});
       }
 
+      user = new User({
+        name,
+        email,
+        password
+      });
+
+      // Encrypt password
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+
+      // Save data
+      await user.save();
+
       // Send sign up success email
       const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -39,7 +52,7 @@ class AuthController {
 
       const content = `
         <h1>Thanks for register aware account</h1>
-        <p>Visit aware page: <a href="http://localhost:3000">Aware</a></p>
+        <h2>Visit aware page: <a href="http://localhost:3000">Aware</a></h2>
       `;
 
       const mailOptions = {
@@ -61,6 +74,55 @@ class AuthController {
             errors: [{ message: err.message }],
           });
         });
+    } catch (error) {
+      return res.status(500).send('Server error');
+    }
+  }
+
+  // @route   POST api/auth/login
+  // @desc    Log in customer account
+  // @access  Public
+  async logIn(req, res) {
+    // Validate request body
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    // Get data from body
+    const { email, password } = req.body;
+
+    try {
+      // Check if user with this email exist
+      let user = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).json({
+          errors: [{ message: 'Your e-mail/password is invalid' }]
+        })
+      }
+
+      // Check if password match
+      const isMatch = await user.checkPassWord(password);
+      if (!isMatch) {
+        return res.status(400).json({
+          errors: [{ message: 'Your e-mail/password is invalid' }]
+        })
+      }
+
+      // Create token payload
+      const payload = {
+        user: {
+          id: user._id,
+          role: user.role
+        }
+      };
+
+      // Generate token
+      const token = jwt.sign(payload, config.logInSecret, {
+        expiresIn: '7d'
+      });
+
+      return res.json({ token });
     } catch (error) {
       return res.status(500).send('Server error');
     }

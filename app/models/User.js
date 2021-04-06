@@ -14,7 +14,8 @@ const UserSchema = new Schema({
   createdAt: { type: Date, default: dayjs().toISOString() },
 });
 
-UserSchema.methods.checkPassword = async function(password) {
+UserSchema.methods.checkPassWord = async function(password) {
+  console.log(password)
   return await bcrypt.compare(password, this.password);
 }
 
