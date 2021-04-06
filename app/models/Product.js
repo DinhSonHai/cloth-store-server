@@ -4,7 +4,7 @@ const dayjs = require('dayjs');
 const Schema = mongoose.Schema;
 
 const ProductSchema = new Schema({
-  images: [{ type: String, trim: true }],
+  photos: [{ type: String, trim: true }],
   name: { type: String, require: true, trim: true },
   categoryId: { type: Schema.Types.ObjectId, ref: 'category', require: true },
   brand: { type: String, require: true, trim: true },
