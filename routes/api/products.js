@@ -12,6 +12,11 @@ const { validateAddCloth } = require('../../helpers/valid');
 // @access  Public
 router.get('/', ProductController.getAll);
 
+// @route   GET api/products/:productId
+// @desc    Get Cloth by Id
+// @access  Public
+router.get('/:productId', ProductController.getById);
+
 // @route   POST api/products/
 // @desc    Add Clothes
 // @access  Private Admin

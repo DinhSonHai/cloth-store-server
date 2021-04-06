@@ -21,6 +21,21 @@ class ProductController {
     }
   }
 
+  // @route   GET api/products/:productId
+  // @desc    Get Cloth by Id
+  // @access  Public
+  async getById(req, res) {
+    try {
+      const product = await Product.findById(req.params.productId);
+      if (!product) {
+        return res.status(400).json({ errors: [{ message: 'No product found' }]});
+      }
+      return res.json({ product });
+    } catch (error) {
+      return res.status(500).send('Server error');
+    }
+  }
+
   // @route   POST api/products/
   // @desc    Add Clothes
   // @access  Private Admin
