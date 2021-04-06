@@ -11,7 +11,6 @@ const UserSchema = new Schema({
   resetPasswordLink: { type: String, default: '' },
   // role 0 is admin, 1 is user
   role: { type: Number, default: 1 },
-  createdAt: { type: Date, default: dayjs().toISOString() },
 });
 
 UserSchema.methods.checkPassWord = async function(password) {
