@@ -8,10 +8,10 @@ const ProductSchema = new Schema({
   categories: [{ type: Schema.Types.ObjectId, ref: 'category' }],
   brand: { type: String, require: true, trim: true },
   price: { type: Number, required: true },
-  variants: [{ 
+  variants: [{
     size: { type: String, require: true, trim: true },
     quantity: { type: Number, required: true }
-   }],
+  }],
   description: { type: String, trim: true, default: '' },
 });
 

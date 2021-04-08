@@ -41,8 +41,9 @@ module.exports.validateAddCloth = [
   check('price')
     .isNumeric()
     .withMessage('Please enter a valid price'),
-  body('variants').exists().withMessage('Please enter size and quantity'),
-  body('variants.*.size').exists().withMessage('Please enter size and quantity'),
-  body('variants.*.quantity').exists().isNumeric().withMessage('Please enter size and quantity'),
+  body('variants').exists().withMessage('Please enter cloth variants'),
+  body('variants.*.size').exists().withMessage('Please enter size'),
+  body('variants.*.color').exists().withMessage('Please enter color'),
+  body('variants.*.quantity').exists().isNumeric().withMessage('Please enter quantity'),
   check('description').notEmpty().withMessage('Please enter a description')
 ]
