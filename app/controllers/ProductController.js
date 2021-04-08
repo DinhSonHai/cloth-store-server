@@ -13,7 +13,7 @@ class ProductController {
     try {
       const products = await Product.find({});
       if (!products) {
-        return res.status(400).json({ errors: [{ message: 'No product found' }]});
+        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
       return res.json({ products });
     } catch (error) {
@@ -28,7 +28,7 @@ class ProductController {
     try {
       const product = await Product.findById(req.params.productId);
       if (!product) {
-        return res.status(400).json({ errors: [{ message: 'No product found' }]});
+        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
       return res.json({ product });
     } catch (error) {
@@ -53,7 +53,7 @@ class ProductController {
     });
 
     try {
-      await product.save(); 
+      await product.save();
       return res.json({ message: 'Add cloth success' });
     } catch (error) {
       return res.status(500).send('Server error!');

@@ -25,7 +25,7 @@ class AuthController {
       // Check if email exist
       let user = await User.findOne({ email });
       if (user) {
-        return res.status(400).json({ errors: [{ message: 'This email has already signed up' }]});
+        return res.status(400).json({ errors: [{ msg: 'This email has already signed up' }] });
       }
 
       user = new User({
@@ -41,39 +41,42 @@ class AuthController {
       // Save data
       await user.save();
 
+      // Without send mail
+      res.json({ message: 'Thanks for register aware account' });
+
       // Send sign up success email
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: config.email,
-          pass: config.passWord
-        }
-      })
+      // const transporter = nodemailer.createTransport({
+      //   service: 'gmail',
+      //   auth: {
+      //     user: config.email,
+      //     pass: config.passWord
+      //   }
+      // })
 
-      const content = `
-        <h1>Thanks for register aware account</h1>
-        <h2>Visit aware page: <a href="http://localhost:3000">Aware</a></h2>
-      `;
+      // const content = `
+      //   <h1>Thanks for register aware account</h1>
+      //   <h2>Visit aware page: <a href="http://localhost:3000">Aware</a></h2>
+      // `;
 
-      const mailOptions = {
-        from: config.email,
-        to: email,
-        subject: 'Account register success',
-        html: content,
-      };
+      // const mailOptions = {
+      //   from: config.email,
+      //   to: email,
+      //   subject: 'Account register success',
+      //   html: content,
+      // };
 
-      transporter
-        .sendMail(mailOptions)
-        .then(() => {
-          return res.json({
-            message: 'Thanks for register aware account',
-          });
-        })
-        .catch((err) => {
-          return res.status(400).json({
-            errors: [{ message: err.message }],
-          });
-        });
+      // transporter
+      //   .sendMail(mailOptions)
+      //   .then(() => {
+      //     return res.json({
+      //       message: 'Thanks for register aware account',
+      //     });
+      //   })
+      //   .catch((err) => {
+      //     return res.status(400).json({
+      //       errors: [{ message: err.message }],
+      //     });
+      //   });
     } catch (error) {
       return res.status(500).send('Server error');
     }
@@ -97,7 +100,7 @@ class AuthController {
       let user = await User.findOne({ email });
       if (!user) {
         return res.status(400).json({
-          errors: [{ message: 'Your e-mail/password is invalid' }]
+          errors: [{ msg: 'Your e-mail/password is invalid' }]
         })
       }
 
@@ -105,7 +108,7 @@ class AuthController {
       const isMatch = await user.checkPassWord(password);
       if (!isMatch) {
         return res.status(400).json({
-          errors: [{ message: 'Your e-mail/password is invalid' }]
+          errors: [{ msg: 'Your e-mail/password is invalid' }]
         })
       }
 
