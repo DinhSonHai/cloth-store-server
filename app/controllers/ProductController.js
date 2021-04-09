@@ -15,7 +15,7 @@ class ProductController {
       if (!products) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
-      return res.json({ products });
+      return res.json(products);
     } catch (error) {
       return res.status(500).send('Server error');
     }
@@ -46,10 +46,10 @@ class ProductController {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, categories, brand, price, variants, description } = req.body;
+    const { photos, name, categories, brand, price, variants, description } = req.body;
 
     const product = new Product({
-      name, categories, brand, price, variants, description
+      photos, name, categories, brand, price, variants, description
     });
 
     try {

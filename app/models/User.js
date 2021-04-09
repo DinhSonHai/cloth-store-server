@@ -13,8 +13,7 @@ const UserSchema = new Schema({
   role: { type: Number, default: 1 },
 });
 
-UserSchema.methods.checkPassWord = async function(password) {
-  console.log(password)
+UserSchema.methods.checkPassWord = async function (password) {
   return await bcrypt.compare(password, this.password);
 }
 
