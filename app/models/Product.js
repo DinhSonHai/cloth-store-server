@@ -6,13 +6,16 @@ const ProductSchema = new Schema({
   photos: [{ type: String, trim: true }],
   name: { type: String, require: true, trim: true },
   categories: [{ type: Schema.Types.ObjectId, ref: 'category' }],
-  brand: { type: String, require: true, trim: true },
+  brand: { type: Schema.Types.ObjectId, ref: 'brand' },
   price: { type: Number, required: true },
   variants: [{
-    size: { type: String, require: true, trim: true },
-    quantity: { type: Number, required: true }
+    sizeId: { type: Schema.Types.ObjectId, ref: 'size' },
+    colorId: { type: Schema.Types.ObjectId, ref: 'color' },
+    quantity: { type: Number, required: true },
+    isActive: { type: Boolean, default: true }
   }],
   description: { type: String, trim: true, default: '' },
+  isActive: { type: Boolean, default: true }
 });
 
 module.exports = mongoose.model('product', ProductSchema);
