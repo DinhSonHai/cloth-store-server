@@ -54,7 +54,7 @@ class ProductController {
 
     try {
       await product.save();
-      return res.json({ message: 'Add cloth success' });
+      return res.json({ msg: 'Add cloth success' });
     } catch (error) {
       return res.status(500).send('Server error!');
     }

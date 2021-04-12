@@ -8,6 +8,72 @@ const User = require('../models/User');
 
 class AuthController {
 
+  // @route   POST api/auth/user
+  // @desc    Get user data
+  // @access  Private
+  async getUser(req, res) {
+    try {
+      const user = await User.findById(req.user._id).select(['-password', '-resetPasswordLink']);
+      if (!user) {
+        return res.status(404).json({
+          errors: [{ msg: 'User not exist' }],
+        });
+      }
+      return res.json(user);
+    } catch (error) {
+      return res.status(500).send('Server Error');
+    }
+  }
+
+    // @route   POST api/auth/login
+  // @desc    Log in customer account
+  // @access  Public
+  async logIn(req, res) {
+    // Validate request body
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    // Get data from body
+    const { email, password } = req.body;
+
+    try {
+      // Check if user with this email exist
+      let user = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).json({
+          errors: [{ msg: 'Your e-mail/password is invalid' }]
+        })
+      }
+
+      // Check if password match
+      const isMatch = await user.checkPassWord(password);
+      if (!isMatch) {
+        return res.status(400).json({
+          errors: [{ msg: 'Your e-mail/password is invalid' }]
+        })
+      }
+
+      // Create token payload
+      const payload = {
+        user: {
+          _id: user._id,
+          role: user.role
+        }
+      };
+
+      // Generate token
+      const token = jwt.sign(payload, config.logInSecret, {
+        expiresIn: '7d'
+      });
+
+      return res.json({ token });
+    } catch (error) {
+      return res.status(500).send('Server error');
+    }
+  }
+
   // @route   POST api/auth/signup
   // @desc    Sign up customer account
   // @access  Public
@@ -42,7 +108,7 @@ class AuthController {
       await user.save();
 
       // Without send mail
-      res.json({ message: 'Thanks for register aware account' });
+      res.json({ msg: 'Thanks for register aware account' });
 
       // Send sign up success email
       // const transporter = nodemailer.createTransport({
@@ -69,63 +135,14 @@ class AuthController {
       //   .sendMail(mailOptions)
       //   .then(() => {
       //     return res.json({
-      //       message: 'Thanks for register aware account',
+      //       msg: 'Thanks for register aware account',
       //     });
       //   })
       //   .catch((err) => {
       //     return res.status(400).json({
-      //       errors: [{ message: err.message }],
+      //       errors: [{ msg: err.message }],
       //     });
       //   });
-    } catch (error) {
-      return res.status(500).send('Server error');
-    }
-  }
-
-  // @route   POST api/auth/login
-  // @desc    Log in customer account
-  // @access  Public
-  async logIn(req, res) {
-    // Validate request body
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    // Get data from body
-    const { email, password } = req.body;
-
-    try {
-      // Check if user with this email exist
-      let user = await User.findOne({ email });
-      if (!user) {
-        return res.status(400).json({
-          errors: [{ msg: 'Your e-mail/password is invalid' }]
-        })
-      }
-
-      // Check if password match
-      const isMatch = await user.checkPassWord(password);
-      if (!isMatch) {
-        return res.status(400).json({
-          errors: [{ msg: 'Your e-mail/password is invalid' }]
-        })
-      }
-
-      // Create token payload
-      const payload = {
-        user: {
-          id: user._id,
-          role: user.role
-        }
-      };
-
-      // Generate token
-      const token = jwt.sign(payload, config.logInSecret, {
-        expiresIn: '7d'
-      });
-
-      return res.json({ token });
     } catch (error) {
       return res.status(500).send('Server error');
     }
