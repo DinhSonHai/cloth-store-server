@@ -5,6 +5,7 @@ const config = require('../../config/default.json');
 const { validationResult } = require('express-validator');
 
 const User = require('../models/User');
+const Admin = require('../models/Admin');
 
 class AuthController {
 
@@ -143,6 +144,56 @@ class AuthController {
       //       errors: [{ msg: err.message }],
       //     });
       //   });
+    } catch (error) {
+      return res.status(500).send('Server error');
+    }
+  }
+
+
+  // @route   POST api/auth/login
+  // @desc    Log in admin account
+  // @access  Public
+  async logInAsAdmin(req, res) {
+    // Validate request body
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    // Get data from body
+    const { email, password } = req.body;
+
+    try {
+      // Check if admin exist
+      let admin = await Admin.findOne({ email });
+      if (!admin) {
+        return res.status(400).json({
+          errors: [{ msg: 'Your e-mail/password is invalid' }]
+        })
+      }
+
+      // Check if password match
+      const isMatch = await admin.checkPassWord(password);
+      if (!isMatch) {
+        return res.status(400).json({
+          errors: [{ msg: 'Your e-mail/password is invalid' }]
+        })
+      }
+
+      // Create token payload
+      const payload = {
+        user: {
+          _id: admin._id,
+          role: admin.role
+        }
+      };
+
+      // Generate token
+      const token = jwt.sign(payload, config.logInSecret, {
+        expiresIn: '7d'
+      });
+
+      return res.json({ token });
     } catch (error) {
       return res.status(500).send('Server error');
     }
