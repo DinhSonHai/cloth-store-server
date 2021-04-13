@@ -79,6 +79,31 @@ class ReviewController {
     }
   }
 
+  // @route   GET api/reviews/:productId/review/:reviewId
+  // @desc    Get a single product review
+  // @access  Private
+  async getReviewById(req, res) {
+    try {
+      const product = await Product.findById(req.params.productId);
+      if (!product) {
+        return res.status(404).json({ errors: [{ msg: 'Product not found' }] });
+      }
+
+      const review = await Review.findById(req.params.reviewId);
+      if (!review) {
+        return res.status(400).json({ errors: [{ msg: 'Review not found' }] });
+      }
+
+      if (review.productId.toString() !== product._id.toString()) {
+        return res.status(404).json({ errors: [{ msg: 'Review not found' }] });
+      }
+      
+      return res.json(review);
+    } catch (error) {
+      return res.status(500).send('Server error');
+    }
+  }
+
   // @route   PUT api/reviews/:productId/review/:reviewId
   // @desc    Edit A Product REVIEW
   // @access  Private

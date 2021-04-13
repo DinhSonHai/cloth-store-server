@@ -17,6 +17,11 @@ router.get('/:productId/review', ReviewController.getAllProductReviews);
 // @access  Private
 router.post('/:productId/review', [auth, validateReview], ReviewController.review);
 
+// @route   GET api/reviews/:productId/review/:reviewId
+// @desc    Get a single product review
+// @access  Private
+router.get('/:productId/review/:reviewId', [auth], ReviewController.getReviewById);
+
 // @route   PUT api/reviews/:productId/review/:reviewId
 // @desc    Edit A Product REVIEW
 // @access  Private
