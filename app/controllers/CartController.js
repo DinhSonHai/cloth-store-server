@@ -25,10 +25,10 @@ class CartController {
     }
   }
 
-  // @route   PUT cartsapi/carts
+  // @route   PUT api/carts
   // @desc    Add item to cart
   // @access  Private
-  async addCart(req, res) {
+  async addItemToCart(req, res) {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -67,6 +67,32 @@ class CartController {
       }
 
       return res.json({ msg: 'Add item to cart successfully' });
+    } catch (error) {
+      return res.status(500).send('Server error!');
+    }
+  }
+
+  // @route   DELETE api/carts
+  // @desc    Remove item from cart
+  // @access  Private
+  async removeItemFromCart(req, res) {
+    // Validate request body
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { productId, sizeId, colorId } = req.body;
+
+    try {
+      const cart = await Cart.findOne({ userId: req.user._id, productId, sizeId, colorId });
+
+      if (!cart) {
+        return res.status(400).json({ errors: [{ msg: 'Not found' }] });
+      }
+
+      await cart.remove();
+      return res.json({ msg: 'Success' });
     } catch (error) {
       return res.status(500).send('Server error!');
     }

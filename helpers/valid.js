@@ -55,8 +55,8 @@ module.exports.validateReview = [
     .withMessage('Star rating must between 0 and 5')
 ]
 
-// Validate add cart
-module.exports.validateAddCart = [
+// Validate add item to cart
+module.exports.validateAddItemToCart = [
   check('productId')
     .notEmpty()
     .withMessage('Please choose product'),
@@ -71,4 +71,17 @@ module.exports.validateAddCart = [
     .withMessage('Please choose quantity')
     .isInt()
     .withMessage('Quantity is not valid'),
+]
+
+// Validate remove item from cart
+module.exports.validateRemoveItemFromCart = [
+  check('productId')
+    .notEmpty()
+    .withMessage('Please choose product'),
+  check('sizeId')
+    .notEmpty()
+    .withMessage('Please choose size'),
+  check('colorId')
+    .notEmpty()
+    .withMessage('Please choose color')
 ]
