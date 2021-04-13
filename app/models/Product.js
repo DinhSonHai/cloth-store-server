@@ -10,7 +10,7 @@ const ProductSchema = new Schema({
   price: { type: Number, required: true },
   variants: [{
     sizeId: { type: Schema.Types.ObjectId, ref: 'size', require: true },
-    color: { type: String, require: true },
+    color: { type: Schema.Types.ObjectId, ref: 'color', require: true },
     quantity: { type: Number, required: true },
     isActive: { type: Boolean, default: true }
   }],

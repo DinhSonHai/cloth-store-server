@@ -25,7 +25,7 @@ class AuthController {
     }
   }
 
-    // @route   POST api/auth/login
+  // @route   POST api/auth/login
   // @desc    Log in customer account
   // @access  Public
   async logIn(req, res) {

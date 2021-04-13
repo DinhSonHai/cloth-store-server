@@ -7,4 +7,4 @@ const TypeSchema = new Schema({
   collectionId: { type: Schema.Types.ObjectId, ref: 'collection', require: true }
 });
 
-module.exports = mongoose.Schema('type', TypeSchema);
+module.exports = mongoose.model('type', TypeSchema);

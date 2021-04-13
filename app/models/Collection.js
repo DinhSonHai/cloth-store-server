@@ -6,4 +6,4 @@ const CollectionSchema = new Schema({
   collectionName: { type: String, require: true, trim: true },
 });
 
-module.exports = mongoose.Schema('collection', CollectionSchema);
+module.exports = mongoose.model('collection', CollectionSchema);

@@ -7,4 +7,4 @@ const CategorySchema = new Schema({
   typeId: { type: Schema.Types.ObjectId, ref: 'type', require: true }
 })
 
-module.exports = mongoose.Schema('category', CategorySchema);
+module.exports = mongoose.model('category', CategorySchema);
