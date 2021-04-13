@@ -54,3 +54,21 @@ module.exports.validateReview = [
     .isFloat({ min: 0, max: 5 })
     .withMessage('Star rating must between 0 and 5')
 ]
+
+// Validate add cart
+module.exports.validateAddCart = [
+  check('productId')
+    .notEmpty()
+    .withMessage('Please choose product'),
+  check('sizeId')
+    .notEmpty()
+    .withMessage('Please choose size'),
+  check('colorId')
+    .notEmpty()
+    .withMessage('Please choose color'),
+  check('quantity')
+    .notEmpty()
+    .withMessage('Please choose quantity')
+    .isInt()
+    .withMessage('Quantity is not valid'),
+]
