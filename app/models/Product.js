@@ -1,3 +1,4 @@
+const dayjs = require('dayjs');
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
@@ -19,6 +20,7 @@ const ProductSchema = new Schema({
   starRatings: { type: Number, default: 0, min: 0, max: 5 },
   starsCount: { type: Number, default: 0 },
   reviewsCount: { type: Number, default: 0 },
+  createdAt: { type: Date, default: dayjs().toISOString() }
 });
 
 module.exports = mongoose.model('product', ProductSchema);
