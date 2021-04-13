@@ -10,6 +10,7 @@ const UserSchema = new Schema({
   password: { type: String, required: true, trim: true },
   avatar: { type: String, default: "https://res.cloudinary.com/sonhai/image/upload/v1618283547/default-avatar_fjlzn4.jpg"},
   resetPasswordLink: { type: String, default: '' },
+  purchasedProducts: [{ type: Schema.Types.ObjectId, ref: 'product' }],
   // role 0 is admin, 1 is user
   role: { type: Number, default: 1 },
 });

@@ -6,8 +6,8 @@ const Schema = mongoose.Schema;
 const ReviewSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'user', require: true },
   productId: { type: Schema.Types.ObjectId, ref: 'product', require: true },
-  title: { type: String },
-  comment: { type: String },
+  title: { type: String, default: '' },
+  comment: { type: String, default: '' },
   starRatings: { type: Number, require: true },
   commentedAt: { type: Date, default: dayjs().toISOString() }
 });

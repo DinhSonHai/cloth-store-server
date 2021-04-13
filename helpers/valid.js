@@ -47,3 +47,10 @@ module.exports.validateAddCloth = [
   body('variants.*.quantity').exists().isNumeric().withMessage('Please enter quantity'),
   check('description').notEmpty().withMessage('Please enter a description')
 ]
+
+// Validate review product
+module.exports.validateReview = [
+  check('starRatings')
+    .isFloat({ min: 0, max: 5 })
+    .withMessage('Star rating must between 0 and 5')
+]
