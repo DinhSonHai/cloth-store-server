@@ -23,8 +23,13 @@ router.get('/:productId', ProductController.getById);
 router.post('/', [auth, checkPermission, validateAddCloth], ProductController.addCloth);
 
 // @route   PUT api/products/:productId
-// @desc    Edit Clothes
+// @desc    Edit clothes by productId
 // @access  Private Admin
 router.put('/:productId', [auth, checkPermission, validateAddCloth], ProductController.editCloth);
+
+// @route   DELETE api/products/:productId
+// @desc    Remove clothes by productId
+// @access  Private Admin
+router.delete('/:productId', [auth, checkPermission], ProductController.removeCloth);
 
 module.exports = router;

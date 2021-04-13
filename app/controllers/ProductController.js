@@ -61,8 +61,8 @@ class ProductController {
     }
   }
 
-  // @route   PUT api/products/
-  // @desc    Edit Clothes
+  // @route   PUT api/products/:productId
+  // @desc    Edit clothes by productId
   // @access  Private Admin
   async editCloth(req, res) {
     // Validate request body
@@ -83,6 +83,22 @@ class ProductController {
 
       await product.save();
       return res.json({ msg: 'Edit cloth success' });
+    } catch (error) {
+      return res.status(500).send('Server error!');
+    }
+  }
+
+  // @route   DELETE api/products/:productId
+  // @desc    Remove clothes by productId
+  // @access  Private Admin
+  async removeCloth(req, res) {
+    try {
+      const product = await Product.findById(req.params.productId);
+      if (!product) {
+        return res.status(404).json({ errors: [{ msg: 'Product not found' }] });
+      }
+      await product.remove();
+      return res.json({ msg: 'Cloth removed!' })
     } catch (error) {
       return res.status(500).send('Server error!');
     }
