@@ -17,4 +17,9 @@ router.get('/:productId/review', ReviewController.getAllProductReviews);
 // @access  Private
 router.post('/:productId/review', [auth, validateReview], ReviewController.review);
 
+// @route   DELETE api/reviews/:productId/review/:reviewId
+// @desc    Delete A Product REVIEW
+// @access  Private
+router.delete('/:productId/review/:reviewId', [auth], ReviewController.deleteReview);
+
 module.exports = router;
