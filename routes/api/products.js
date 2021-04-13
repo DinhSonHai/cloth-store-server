@@ -20,6 +20,11 @@ router.get('/:productId', ProductController.getById);
 // @route   POST api/products/
 // @desc    Add Clothes
 // @access  Private Admin
-router.post('/', validateAddCloth, auth, checkPermission, ProductController.add);
+router.post('/', [auth, checkPermission, validateAddCloth], ProductController.addCloth);
+
+// @route   PUT api/products/:productId
+// @desc    Edit Clothes
+// @access  Private Admin
+router.put('/:productId', [auth, checkPermission, validateAddCloth], ProductController.editCloth);
 
 module.exports = router;

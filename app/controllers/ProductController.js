@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const config = require('../../config/default.json');
 const { validationResult } = require('express-validator');
+const _ = require('lodash');
 
 const Product = require('../models/Product');
 
@@ -39,7 +40,7 @@ class ProductController {
   // @route   POST api/products/
   // @desc    Add Clothes
   // @access  Private Admin
-  async add(req, res) {
+  async addCloth(req, res) {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -55,6 +56,33 @@ class ProductController {
     try {
       await product.save();
       return res.json({ msg: 'Add cloth success' });
+    } catch (error) {
+      return res.status(500).send('Server error!');
+    }
+  }
+
+  // @route   PUT api/products/
+  // @desc    Edit Clothes
+  // @access  Private Admin
+  async editCloth(req, res) {
+    // Validate request body
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { photos, name, categories, brand, price, variants, description } = req.body;
+
+    try {
+      let product = await Product.findById(req.params.productId);
+      if (!product) {
+        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+      }
+
+      product = _.extend(product, { photos, name, categories, brand, price, variants, description });
+
+      await product.save();
+      return res.json({ msg: 'Edit cloth success' });
     } catch (error) {
       return res.status(500).send('Server error!');
     }
