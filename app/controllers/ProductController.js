@@ -27,13 +27,14 @@ class ProductController {
   // @access  Public
   async getById(req, res) {
     try {
-      const product = await Product.findById(req.params.productId);
+      const product = await Product.findById(req.params.productId).populate('variants.sizeId variants.colorId');
       if (!product) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
       return res.json(product);
     } catch (error) {
-      return res.status(500).send('Server error');
+      // return res.status(500).send('Server error');
+      return res.json(error)
     }
   }
 
