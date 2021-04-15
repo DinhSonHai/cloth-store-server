@@ -29,7 +29,7 @@ class ProductController {
   async getAllProductsInCart(req, res) {
     const { productIdList } = req.body;
     try {
-      const products = await Product.find({ '_id': { $in: productIdList } });
+      const products = await Product.find({ '_id': { $in: productIdList } }).populate('sizes colors');
 
       if (!products) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
