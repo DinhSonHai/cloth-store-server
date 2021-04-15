@@ -27,14 +27,13 @@ class ProductController {
   // @access  Public
   async getById(req, res) {
     try {
-      const product = await Product.findById(req.params.productId).populate('variants.sizeId variants.colorId');
+      const product = await Product.findById(req.params.productId);
       if (!product) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
       return res.json(product);
     } catch (error) {
-      // return res.status(500).send('Server error');
-      return res.json(error)
+      return res.status(500).send('Server error');
     }
   }
 
@@ -48,10 +47,10 @@ class ProductController {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { photos, name, categories, brand, price, sizes, colors, quantity, description } = req.body;
+    const { photos, name, categories, brandId, price, sizes, colors, quantity, description } = req.body;
 
     const product = new Product({
-      photos, name, categories, brand, price, sizes, colors, quantity, description
+      photos, name, categories, brandId, price, sizes, colors, quantity, description
     });
 
     try {
@@ -72,7 +71,7 @@ class ProductController {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { photos, name, categories, brand, price, sizes, colors, quantity, description } = req.body;
+    const { photos, name, categories, brandId, price, sizes, colors, quantity, description } = req.body;
 
     try {
       let product = await Product.findById(req.params.productId);
@@ -80,7 +79,7 @@ class ProductController {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
 
-      product = _.extend(product, { photos, name, categories, brand, price, sizes, colors, quantity, description });
+      product = _.extend(product, { photos, name, categories, brandId, price, sizes, colors, quantity, description });
 
       await product.save();
       return res.json({ msg: 'Edit cloth success' });

@@ -7,7 +7,7 @@ const ProductSchema = new Schema({
   photos: [{ type: String, trim: true, require: true }],
   name: { type: String, require: true, trim: true },
   categories: [{ type: Schema.Types.ObjectId, ref: 'category', require: true }],
-  brand: { type: Schema.Types.ObjectId, ref: 'brand', require: true },
+  brandId: { type: Schema.Types.ObjectId, ref: 'brand', require: true },
   price: { type: Number, required: true },
   sizes: [{ type: Schema.Types.ObjectId, ref: 'size', require: true }],
   colors: [{ type: Schema.Types.ObjectId, ref: 'color', require: true }],

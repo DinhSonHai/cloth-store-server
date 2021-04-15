@@ -1,5 +1,6 @@
 const auth = require('./api/auth');
 const products = require('./api/products');
+const categories = require('./api/categories');
 const reviews = require('./api/reviews');
 const sizes = require('./api/sizes');
 const colors = require('./api/colors');
@@ -10,6 +11,9 @@ function route(app) {
 
   // Product routes
   app.use('/api/products', products);
+
+  // Category routes
+  app.use('/api/categories', categories);
 
   // Review routes
   app.use('/api/reviews', reviews);

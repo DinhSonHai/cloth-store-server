@@ -39,7 +39,7 @@ module.exports.validateAddCloth = [
   body('categories')
     .custom((item)=>_.isArray(item) && item.length > 0)
     .withMessage('Please choose product category'),
-  check('brand')
+  check('brandId')
     .notEmpty()
     .withMessage('Please choose product brand'),
   check('price')
@@ -59,6 +59,16 @@ module.exports.validateAddCloth = [
   check('description')
     .notEmpty()
     .withMessage('Please enter product description'),
+]
+
+// Validate add category data
+module.exports.validateAddCategory = [
+  check('categoryName')
+    .notEmpty()
+    .withMessage('Please enter a valid category'),
+  body('typeId')
+    .notEmpty()
+    .withMessage('Please choose product type'),
 ]
 
 // Validate review product
