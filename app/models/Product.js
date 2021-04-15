@@ -15,7 +15,7 @@ const ProductSchema = new Schema({
   description: { type: String, trim: true, require: true },
   isActive: { type: Boolean, default: true },
   starRatings: { type: Number, default: 0, min: 0, max: 5 },
-  starsCount: { type: Number, default: 0 },
+  totalStars: { type: Number, default: 0 },
   reviewsCount: { type: Number, default: 0 },
   createdAt: { type: Date, default: dayjs().toISOString() }
 });

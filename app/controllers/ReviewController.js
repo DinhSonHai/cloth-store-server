@@ -39,7 +39,7 @@ class ReviewController {
     const { title, comment, starRatings } = req.body;
 
     try {
-      const product = await Product.findById(req.params.productId);
+      let product = await Product.findById(req.params.productId);
       if (!product) {
         return res.status(404).json({ errors: [{ msg: 'Product not found' }] });
       }
@@ -73,6 +73,15 @@ class ReviewController {
       });
 
       await review.save();
+
+      const reviews = await Review.find({ productId: product._id });
+
+      product.reviewsCount = product.reviewsCount + 1;
+      product.totalStars = reviews.reduce((total, currentValue) => total + currentValue.starRatings, 0);
+      product.starRatings = Math.round(product.totalStars / product.reviewsCount);
+
+      await product.save();
+
       return res.json({ msg: 'Review completed'});
     } catch (error) {
       return res.status(500).send('Server error!');
@@ -143,6 +152,14 @@ class ReviewController {
       review.starRatings = starRatings;
 
       await review.save();
+
+      const reviews = await Review.find({ productId: product._id });
+
+      product.totalStars = reviews.reduce((total, currentValue) => total + currentValue.starRatings, 0);
+      product.starRatings = Math.round(product.totalStars / product.reviewsCount);
+
+      await product.save();
+
       return res.json({ msg: 'Edit review completed'});
     } catch (error) {
       return res.status(500).send('Server error!');
@@ -169,6 +186,15 @@ class ReviewController {
       }
 
       await review.remove();
+
+      const reviews = await Review.find({ productId: product._id });
+
+      product.reviewsCount = product.reviewsCount - 1;
+      product.totalStars = reviews.reduce((total, currentValue) => total + currentValue.starRatings, 0);
+      product.starRatings = Math.round(product.totalStars / product.reviewsCount);
+
+      await product.save();
+
       return res.json({ msg: 'Review deleted' });
     } catch (error) {
       return res.status(500).send('Server error!');
