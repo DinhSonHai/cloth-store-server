@@ -3,6 +3,7 @@ const nodemailer = require('nodemailer');
 const config = require('../../config/default.json');
 const { validationResult } = require('express-validator');
 const _ = require('lodash');
+const ObjectId = require('mongoose').Types.ObjectId;
 
 const Product = require('../models/Product');
 
@@ -16,6 +17,24 @@ class ProductController {
       if (!products) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
+      return res.json(products);
+    } catch (error) {
+      return res.status(500).send('Server error');
+    }
+  }
+
+  // @route   POST api/products/carts
+  // @desc    Get Product Info in Carts
+  // @access  public
+  async getAllProductsInCart(req, res) {
+    const { productIdList } = req.body;
+    try {
+      const products = await Product.find({ '_id': { $in: productIdList } });
+
+      if (!products) {
+        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+      }
+
       return res.json(products);
     } catch (error) {
       return res.status(500).send('Server error');
