@@ -1,4 +1,5 @@
 const { check, body } = require('express-validator');
+const _ = require('lodash');
 
 // Validate sign up data
 module.exports.validateSignUp = [
@@ -29,11 +30,14 @@ module.exports.validateLogIn = [
 
 // Validate add cloth data
 module.exports.validateAddCloth = [
+  body('photos')
+    .custom((item)=>_.isArray(item) && item.length > 0)
+    .withMessage('Please choose product photos'),
   check('name')
     .notEmpty()
     .withMessage('Please enter a valid name'),
-  check('categories.*')
-    .notEmpty()
+  body('categories')
+    .custom((item)=>_.isArray(item) && item.length > 0)
     .withMessage('Please choose product category'),
   check('brand')
     .notEmpty()
@@ -41,11 +45,20 @@ module.exports.validateAddCloth = [
   check('price')
     .isNumeric()
     .withMessage('Please enter a valid price'),
-  body('variants').exists().withMessage('Please enter cloth variants'),
-  body('variants.*.sizeId').exists().withMessage('Please enter size'),
-  body('variants.*.colorId').exists().withMessage('Please enter color'),
-  body('variants.*.quantity').exists().isNumeric().withMessage('Please enter quantity'),
-  check('description').notEmpty().withMessage('Please enter a description')
+  body('sizes')
+    .custom((item)=>_.isArray(item) && item.length > 0)
+    .withMessage('Please choose product sizes'),
+  body('colors')
+    .custom((item)=>_.isArray(item) && item.length > 0)
+    .withMessage('Please choose product colors'),
+  check('quantity')
+    .notEmpty()
+    .withMessage('Please enter product quantity')
+    .isInt({ min: 0 })
+    .withMessage('Quantity invalid'),
+  check('description')
+    .notEmpty()
+    .withMessage('Please enter product description'),
 ]
 
 // Validate review product
@@ -53,35 +66,4 @@ module.exports.validateReview = [
   check('starRatings')
     .isFloat({ min: 0, max: 5 })
     .withMessage('Star rating must between 0 and 5')
-]
-
-// Validate add item to cart
-module.exports.validateAddItemToCart = [
-  check('productId')
-    .notEmpty()
-    .withMessage('Please choose product'),
-  check('sizeId')
-    .notEmpty()
-    .withMessage('Please choose size'),
-  check('colorId')
-    .notEmpty()
-    .withMessage('Please choose color'),
-  check('quantity')
-    .notEmpty()
-    .withMessage('Please choose quantity')
-    .isInt()
-    .withMessage('Quantity is not valid'),
-]
-
-// Validate remove item from cart
-module.exports.validateRemoveItemFromCart = [
-  check('productId')
-    .notEmpty()
-    .withMessage('Please choose product'),
-  check('sizeId')
-    .notEmpty()
-    .withMessage('Please choose size'),
-  check('colorId')
-    .notEmpty()
-    .withMessage('Please choose color')
 ]
