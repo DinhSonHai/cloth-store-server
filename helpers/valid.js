@@ -77,3 +77,26 @@ module.exports.validateReview = [
     .isFloat({ min: 0, max: 5 })
     .withMessage('Star rating must between 0 and 5')
 ]
+
+// Validate order
+module.exports.validateOrder = [
+  body('detail')
+    .custom((item)=>_.isArray(item) && item.length > 0)
+    .withMessage('Invalid Field'),
+  body('detail.*.name')
+    .notEmpty()
+    .withMessage('Invalid name'),
+  body('detail.*.productId')
+    .notEmpty()
+    .withMessage('Invalid Field'),
+  body('detail.*.sizeId')
+    .notEmpty()
+    .withMessage('Invalid Field'),
+  body('detail.*.colorId')
+    .notEmpty()
+    .withMessage('Invalid Field'),
+  body('detail.*.quantity')
+    .isInt({ min: 0 })
+    .withMessage('Invalid quantity'),
+]
+

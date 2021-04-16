@@ -4,6 +4,7 @@ const categories = require('./api/categories');
 const reviews = require('./api/reviews');
 const sizes = require('./api/sizes');
 const colors = require('./api/colors');
+const orders = require('./api/orders');
 
 function route(app) {
   // Auth routes
@@ -23,6 +24,9 @@ function route(app) {
 
   // Color routes
   app.use('/api/colors', colors);
+
+  // Order routes
+  app.use('/api/orders', orders);
 }
 
 module.exports = route;
