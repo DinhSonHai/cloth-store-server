@@ -14,6 +14,15 @@ const ProductSchema = new Schema({
   quantity: { type: Number, require: true },
   description: { type: String, trim: true, require: true },
   isActive: { type: Boolean, default: true },
+  reviews: {
+    type: [
+      {
+        type: Schema.Types.ObjectId, 
+        ref: 'review'
+      }
+    ],
+    default: []
+  },
   starRatings: { type: Number, default: 0, min: 0, max: 5 },
   totalStars: { type: Number, default: 0 },
   reviewsCount: { type: Number, default: 0 },

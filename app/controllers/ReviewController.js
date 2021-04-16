@@ -14,7 +14,7 @@ class ReviewController {
     try {
       const reviews = await Review.find({
         productId: req.params.productId
-      });
+      }).populate('userId');
 
       if (!reviews) {
         return res.status(400).json({ errors: [{ msg: 'No reviews found' }] });
@@ -64,7 +64,7 @@ class ReviewController {
         return res.status(404).json({ errors: [{ msg: 'You have already reviewed this product!' }] });
       }
 
-      const review = new Review({
+      let review = new Review({
         userId: user._id,
         productId: product._id,
         title,
@@ -72,10 +72,11 @@ class ReviewController {
         starRatings
       });
 
-      await review.save();
+      review = await review.save();
 
       const reviews = await Review.find({ productId: product._id });
 
+      product.reviews.push(review._id);
       product.reviewsCount = product.reviewsCount + 1;
       product.totalStars = reviews.reduce((total, currentValue) => total + currentValue.starRatings, 0);
       product.starRatings = Math.round(product.totalStars / product.reviewsCount);
@@ -98,7 +99,7 @@ class ReviewController {
         return res.status(404).json({ errors: [{ msg: 'Product not found' }] });
       }
 
-      const review = await Review.findById(req.params.reviewId);
+      const review = await Review.findById(req.params.reviewId).populate('userId');
       if (!review) {
         return res.status(400).json({ errors: [{ msg: 'Review not found' }] });
       }
@@ -189,6 +190,7 @@ class ReviewController {
 
       const reviews = await Review.find({ productId: product._id });
 
+      product.reviews = product.reviews.filter(item => item.toString() !== review._id.toString());
       product.reviewsCount = product.reviewsCount - 1;
       product.totalStars = reviews.reduce((total, currentValue) => total + currentValue.starRatings, 0);
       product.starRatings = Math.round(product.totalStars / product.reviewsCount);
