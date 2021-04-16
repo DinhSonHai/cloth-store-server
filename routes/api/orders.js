@@ -17,6 +17,16 @@ router.post('/', [auth, validateOrder], OrderController.order);
 // @access  Private Admin
 router.get('/admin', [auth, checkPermission], OrderController.getAllOrders);
 
+// @route   PUT api/orders/admin/:orderId/complete
+// @desc    Mark order as completed
+// @access  Private Admin
+router.put('/admin/:orderId/complete', [auth, checkPermission], OrderController.completeOrder);
+
+// @route   PUT api/orders/admin/:orderId/cancle
+// @desc    Mark order as cancled
+// @access  Private Admin
+router.put('/admin/:orderId/cancle', [auth, checkPermission], OrderController.cancleOrder);
+
 // @route   PUT api/orders/:orderId
 // @desc    Cancle order
 // @access  Private

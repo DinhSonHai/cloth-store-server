@@ -64,7 +64,7 @@ class OrderController {
     try {
       const order = await Order.findById(req.params.orderId);
       if (!order) {
-        return res.status(400).json({ errors: [{ msg: 'No order found' }] });
+        return res.status(400).json({ errors: [{ msg: 'Order not found' }] });
       }
 
       if (order.userId.toString() !== req.user._id.toString()) {
@@ -93,6 +93,47 @@ class OrderController {
       return res.status(500).send('Server error!');
     }
   }
+
+  // @route   PUT api/orders/admin/:orderId/complete
+  // @desc    Mark order as completed
+  // @access  Private Admin
+  async completeOrder(req, res) {
+    try {
+      const order = await Order.findById(req.params.orderId);
+      if (!order) {
+        return res.status(400).json({ errors: [{ msg: 'Order not found' }] });
+      }
+
+      order.status = 1;
+
+      await order.save();
+
+      return res.json({ msg: 'Order marked as completed' });
+    } catch (error) {
+      return res.status(500).send('Server error!');
+    }
+  }
+
+  // @route   PUT api/orders/admin/:orderId/cancle
+  // @desc    Mark order as cancled
+  // @access  Private Admin
+  async cancleOrder(req, res) {
+    try {
+      const order = await Order.findById(req.params.orderId);
+      if (!order) {
+        return res.status(400).json({ errors: [{ msg: 'Order not found' }] });
+      }
+
+      order.status = 0;
+
+      await order.save();
+
+      return res.json({ msg: 'Order marked as cancled' });
+    } catch (error) {
+      return res.status(500).send('Server error!');
+    }
+  }
 }
+
 
 module.exports = new OrderController();
