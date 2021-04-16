@@ -56,6 +56,43 @@ class OrderController {
       return res.status(500).send('Server error!');
     }
   }
+
+  // @route   PUT api/orders/:orderId
+  // @desc    Cancle order
+  // @access  Private
+  async cancleOrder(req, res) {
+    try {
+      const order = await Order.findById(req.params.orderId);
+      if (!order) {
+        return res.status(400).json({ errors: [{ msg: 'No order found' }] });
+      }
+
+      if (order.userId.toString() !== req.user._id.toString()) {
+        return res.status(401).json({ msg: 'User not authorized' });
+      }
+
+      order.status = 0;
+      await order.save();
+      return res.json({ msg: 'Cancle order success' });
+    } catch (error) {
+      return res.status(500).send('Server error!');
+    }
+  }
+
+  // @route   POST api/orders/admin
+  // @desc    Get All Orders
+  // @access  Private Admin
+  async getAllOrders(req, res) {
+    try {
+      const orders = await Order.find({});
+      if (!orders) {
+        return res.status(400).json({ errors: [{ msg: 'No order found' }] });
+      }
+      return res.json(orders)
+    } catch (error) {
+      return res.status(500).send('Server error!');
+    }
+  }
 }
 
 module.exports = new OrderController();
