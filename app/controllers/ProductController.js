@@ -46,7 +46,7 @@ class ProductController {
   // @access  Public
   async getById(req, res) {
     try {
-      const product = await Product.findById(req.params.productId).populate('sizes colors reviews');
+      const product = await Product.findById(req.params.productId).populate('sizes colors').populate({ path: 'reviews', populate: { path: 'userId' }});
       if (!product) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }

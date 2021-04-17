@@ -86,7 +86,7 @@ class AuthController {
     }
 
     // Get data from body
-    const { name, email, password } = req.body;
+    let { name, email, password } = req.body;
 
     try {
       // Check if email exist
@@ -95,15 +95,15 @@ class AuthController {
         return res.status(400).json({ errors: [{ msg: 'This email has already signed up' }] });
       }
 
+      // Encrypt password
+      const salt = await bcrypt.genSalt(10);
+      password = await bcrypt.hash(password, salt);
+
       user = new User({
         name,
         email,
         password
       });
-
-      // Encrypt password
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(password, salt);
 
       // Save data
       await user.save();
