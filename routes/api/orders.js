@@ -25,11 +25,11 @@ router.put('/admin/:orderId/complete', [auth, checkPermission], OrderController.
 // @route   PUT api/orders/admin/:orderId/cancle
 // @desc    Mark order as cancled
 // @access  Private Admin
-router.put('/admin/:orderId/cancle', [auth, checkPermission], OrderController.cancleOrder);
+router.put('/admin/:orderId/cancel', [auth, checkPermission], OrderController.cancelOrderByAdmin);
 
 // @route   PUT api/orders/:orderId
 // @desc    Cancle order
 // @access  Private
-router.put('/:orderId', auth, OrderController.cancleOrder);
+router.put('/:orderId', auth, OrderController.cancelOrder);
 
 module.exports = router;

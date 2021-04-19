@@ -1,5 +1,6 @@
 
 const { validationResult } = require('express-validator');
+const dayjs = require('dayjs');
 const ObjectId = require('mongoose').Types.ObjectId;
 const Product = require('../models/Product');
 const User = require('../models/User');
@@ -33,7 +34,7 @@ class ReviewController {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ message: errors.array()[0].msg });
     }
 
     const { title, comment, starRatings } = req.body;
@@ -41,18 +42,18 @@ class ReviewController {
     try {
       let product = await Product.findById(req.params.productId);
       if (!product) {
-        return res.status(404).json({ errors: [{ msg: 'Product not found' }] });
+        return res.status(404).json({ message: 'Product not found' });
       }
 
       const user = await User.findById(req.user._id);
       if (!user) {
-        return res.status(404).json({ errors: [{ msg: 'User not exist' }] });
+        return res.status(404).json({ message: 'Users not exists' });
       }
 
       const isPurchased = user.purchasedProducts.some(productId => productId.toString() === product._id.toString());
 
       if (!isPurchased) {
-        return res.status(404).json({ errors: [{ msg: 'You havent buy this product yet!' }] });
+        return res.status(404).json({ message: 'You havent buy this product yet!' });
       }
 
       const isReviewed = await Review.findOne({
@@ -61,7 +62,7 @@ class ReviewController {
       });
 
       if (isReviewed) {
-        return res.status(404).json({ errors: [{ msg: 'You have already reviewed this product!' }] });
+        return res.status(404).json({ message: 'You have already reviewed this product!' });
       }
 
       let review = new Review({
@@ -83,7 +84,7 @@ class ReviewController {
 
       await product.save();
 
-      return res.json({ msg: 'Review completed'});
+      return res.json({ message: 'Review completed' });
     } catch (error) {
       return res.status(500).send('Server error!');
     }
@@ -96,18 +97,18 @@ class ReviewController {
     try {
       const product = await Product.findById(req.params.productId);
       if (!product) {
-        return res.status(404).json({ errors: [{ msg: 'Product not found' }] });
+        return res.status(404).json({ message: 'Product not found' });
       }
 
       const review = await Review.findById(req.params.reviewId).populate('userId');
       if (!review) {
-        return res.status(400).json({ errors: [{ msg: 'Review not found' }] });
+        return res.status(400).json({ message: 'Review not found' });
       }
 
       if (review.productId.toString() !== product._id.toString()) {
-        return res.status(404).json({ errors: [{ msg: 'Review not found' }] });
+        return res.status(404).json({ message: 'Review not found' });
       }
-      
+
       return res.json(review);
     } catch (error) {
       return res.status(500).send('Server error');
@@ -121,7 +122,7 @@ class ReviewController {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ error: errors.array()[0].msg });
     }
 
     const { title, comment, starRatings } = req.body;
@@ -129,21 +130,21 @@ class ReviewController {
     try {
       const product = await Product.findById(req.params.productId);
       if (!product) {
-        return res.status(404).json({ errors: [{ msg: 'Product not found' }] });
+        return res.status(404).json({ message: 'Product not found' });
       }
 
       const user = await User.findById(req.user._id);
       if (!user) {
-        return res.status(404).json({ errors: [{ msg: 'User not exist' }] });
+        return res.status(404).json({ message: 'User not exists' });
       }
 
       let review = await Review.findById(req.params.reviewId);
       if (!review) {
-        return res.status(404).json({ errors: [{ msg: 'Review not found' }] });
+        return res.status(404).json({ message: 'Review not found' });
       }
 
       if (review.userId.toString() !== req.user._id) {
-        return res.status(401).json({ msg: 'User not authorized' });
+        return res.status(401).json({ message: 'User not authorized' });
       }
 
       review.title = title || "";
@@ -151,6 +152,8 @@ class ReviewController {
       review.comment = comment || "";
 
       review.starRatings = starRatings;
+
+      review.commentedAt = dayjs().toISOString();
 
       await review.save();
 
@@ -161,7 +164,7 @@ class ReviewController {
 
       await product.save();
 
-      return res.json({ msg: 'Edit review completed'});
+      return res.json({ msg: 'Edit review completed' });
     } catch (error) {
       return res.status(500).send('Server error!');
     }
@@ -174,16 +177,16 @@ class ReviewController {
     try {
       const product = await Product.findById(req.params.productId);
       if (!product) {
-        return res.status(404).json({ errors: [{ msg: 'Product not found' }] });
+        return res.status(404).json({ message: 'Product not found' });
       }
 
       const review = await Review.findById(req.params.reviewId);
       if (!review) {
-        return res.status(404).json({ errors: [{ msg: 'Review not found' }] });
+        return res.status(404).json({ message: 'Review not found' });
       }
 
       if (review.userId.toString() !== req.user._id) {
-        return res.status(401).json({ msg: 'User not authorized' });
+        return res.status(401).json({ message: 'User not authorized' });
       }
 
       await review.remove();
@@ -197,7 +200,7 @@ class ReviewController {
 
       await product.save();
 
-      return res.json({ msg: 'Review deleted' });
+      return res.json({ message: 'Review deleted' });
     } catch (error) {
       return res.status(500).send('Server error!');
     }

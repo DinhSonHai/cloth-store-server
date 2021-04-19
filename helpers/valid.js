@@ -31,13 +31,13 @@ module.exports.validateLogIn = [
 // Validate add cloth data
 module.exports.validateAddCloth = [
   body('photos')
-    .custom((item)=>_.isArray(item) && item.length > 0)
+    .custom((item) => _.isArray(item) && item.length > 0)
     .withMessage('Please choose product photos'),
   check('name')
     .notEmpty()
     .withMessage('Please enter a valid name'),
   body('categories')
-    .custom((item)=>_.isArray(item) && item.length > 0)
+    .custom((item) => _.isArray(item) && item.length > 0)
     .withMessage('Please choose product category'),
   check('brandId')
     .notEmpty()
@@ -46,10 +46,10 @@ module.exports.validateAddCloth = [
     .isNumeric()
     .withMessage('Please enter a valid price'),
   body('sizes')
-    .custom((item)=>_.isArray(item) && item.length > 0)
+    .custom((item) => _.isArray(item) && item.length > 0)
     .withMessage('Please choose product sizes'),
   body('colors')
-    .custom((item)=>_.isArray(item) && item.length > 0)
+    .custom((item) => _.isArray(item) && item.length > 0)
     .withMessage('Please choose product colors'),
   check('quantity')
     .notEmpty()
@@ -74,14 +74,14 @@ module.exports.validateAddCategory = [
 // Validate review product
 module.exports.validateReview = [
   check('starRatings')
-    .isFloat({ min: 0, max: 5 })
-    .withMessage('Star rating must between 0 and 5')
+    .isInt({ min: 1, max: 5 })
+    .withMessage('Star rating must between 1 and 5')
 ]
 
 // Validate order
 module.exports.validateOrder = [
   body('detail')
-    .custom((item)=>_.isArray(item) && item.length > 0)
+    .custom((item) => _.isArray(item) && item.length > 0)
     .withMessage('Invalid Field'),
   body('detail.*.name')
     .notEmpty()

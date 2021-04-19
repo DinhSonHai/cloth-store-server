@@ -1,9 +1,12 @@
 const { validationResult } = require('express-validator');
 const _ = require('lodash');
 const ObjectId = require('mongoose').Types.ObjectId;
+const nodemailer = require('nodemailer');
 const { customAlphabet } = require('nanoid');
+const config = require('../../config/default.json');
 
 const Order = require('../models/Order');
+const User = require('../models/User');
 const Product = require('../models/Product');
 
 class OrderController {
@@ -15,7 +18,7 @@ class OrderController {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ message: errors.array()[0].msg });
     }
 
     const { detail } = req.body;
@@ -31,13 +34,18 @@ class OrderController {
 
       const products = await Product.find({ '_id': { $in: productIdList } });
       if (!products) {
-        return res.status(400).json({ errors: [{ msg: 'Not found' }] });
+        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+      }
+
+      const user = await User.findById(req.user._id);
+      if (!user) {
+        return res.status(400).json({ message: 'User not found' });
       }
 
       const totalMoney = detail.reduce((total, item) => {
-        const price = products.find(productItem => productItem._id.toString() === item.productId)?.price;
+        const price = products.find(productItem => productItem._id.toString() === item.productId).price;
         if (price) {
-          total = total + item.quantity*price;
+          total = total + item.quantity * price;
         }
         return total;
       }, 0);
@@ -51,7 +59,39 @@ class OrderController {
 
       await order.save();
 
-      return res.json({ msg: 'Order success' });
+      // Send order success email
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: config.email,
+          pass: config.passWord
+        }
+      })
+
+      const content = `
+        <h1>Thanks for shopping on aware</h1>
+        <h2>Visit aware page: <a href="http://localhost:3000">Aware</a></h2>
+      `;
+
+      const mailOptions = {
+        from: config.email,
+        to: user.email,
+        subject: 'Order success at aware',
+        html: content,
+      };
+
+      transporter
+        .sendMail(mailOptions)
+        .then(() => {
+          return res.json({
+            message: 'Order success',
+          });
+        })
+        .catch((err) => {
+          return res.status(400).json({
+            message: err.message
+          });
+        });
     } catch (error) {
       return res.status(500).send('Server error!');
     }
@@ -60,20 +100,24 @@ class OrderController {
   // @route   PUT api/orders/:orderId
   // @desc    Cancle order
   // @access  Private
-  async cancleOrder(req, res) {
+  async cancelOrder(req, res) {
     try {
       const order = await Order.findById(req.params.orderId);
       if (!order) {
-        return res.status(400).json({ errors: [{ msg: 'Order not found' }] });
+        return res.status(404).json({ message: 'Order not found' });
       }
 
       if (order.userId.toString() !== req.user._id.toString()) {
-        return res.status(401).json({ msg: 'User not authorized' });
+        return res.status(401).json({ message: 'User not authorized' });
       }
 
-      order.status = 0;
-      await order.save();
-      return res.json({ msg: 'Cancle order success' });
+      if (order.status === config.PENDING_ORDER) {
+        order.status = config.CANCELED_ORDER;
+        await order.save();
+        return res.json({ message: 'Cancel order success' });
+      }
+
+      return res.json({ message: 'Can not perform this action' });
     } catch (error) {
       return res.status(500).send('Server error!');
     }
@@ -86,7 +130,7 @@ class OrderController {
     try {
       const orders = await Order.find({});
       if (!orders) {
-        return res.status(400).json({ errors: [{ msg: 'No order found' }] });
+        return res.status(404).json({ message: 'No orders found' });
       }
       return res.json(orders)
     } catch (error) {
@@ -101,14 +145,18 @@ class OrderController {
     try {
       const order = await Order.findById(req.params.orderId);
       if (!order) {
-        return res.status(400).json({ errors: [{ msg: 'Order not found' }] });
+        return res.status(404).json({ message: 'Order not found' });
       }
 
-      order.status = 1;
+      if (order.status === config.PENDING_ORDER) {
+        order.status = config.COMPLETED_ORDER;
 
-      await order.save();
+        await order.save();
 
-      return res.json({ msg: 'Order marked as completed' });
+        return res.json({ message: 'Order marked as completed' });
+      }
+      return res.json({ message: 'Can not perform this action' });
+
     } catch (error) {
       return res.status(500).send('Server error!');
     }
@@ -117,18 +165,20 @@ class OrderController {
   // @route   PUT api/orders/admin/:orderId/cancle
   // @desc    Mark order as cancled
   // @access  Private Admin
-  async cancleOrder(req, res) {
+  async cancelOrderByAdmin(req, res) {
     try {
       const order = await Order.findById(req.params.orderId);
       if (!order) {
-        return res.status(400).json({ errors: [{ msg: 'Order not found' }] });
+        return res.status(404).json({ message: 'Order not found' });
       }
 
-      order.status = 0;
+      if (order.status === config.PENDING_ORDER) {
+        order.status = config.CANCELED_ORDER;
+        await order.save();
+        return res.json({ message: 'Order marked as canceled' });
+      }
 
-      await order.save();
-
-      return res.json({ msg: 'Order marked as cancled' });
+      return res.json({ message: 'Can not perform this action' });
     } catch (error) {
       return res.status(500).send('Server error!');
     }

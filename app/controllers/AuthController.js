@@ -33,7 +33,7 @@ class AuthController {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ error: errors.array()[0] });
     }
 
     // Get data from body
@@ -44,7 +44,7 @@ class AuthController {
       let user = await User.findOne({ email });
       if (!user) {
         return res.status(400).json({
-          errors: [{ msg: 'Your e-mail/password is invalid' }]
+          message: 'Your e-mail/password is invalid'
         })
       }
 
@@ -52,7 +52,7 @@ class AuthController {
       const isMatch = await user.checkPassWord(password);
       if (!isMatch) {
         return res.status(400).json({
-          errors: [{ msg: 'Your e-mail/password is invalid' }]
+          message: 'Your e-mail/password is invalid'
         })
       }
 

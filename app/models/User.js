@@ -8,7 +8,7 @@ const UserSchema = new Schema({
   name: { type: String, required: true, trim: true },
   email: { type: String, required: true, unique: true, trim: true },
   password: { type: String, required: true, trim: true },
-  avatar: { type: String, default: "https://res.cloudinary.com/sonhai/image/upload/v1618283547/default-avatar_fjlzn4.jpg"},
+  avatar: { type: String, default: "https://res.cloudinary.com/sonhai/image/upload/v1618283808/default-avatar_etmn1i.jpg" },
   resetPasswordLink: { type: String, default: '' },
   purchasedProducts: [{ type: Schema.Types.ObjectId, ref: 'product' }],
   // role 0 is admin, 1 is user

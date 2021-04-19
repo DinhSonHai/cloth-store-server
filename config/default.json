@@ -1,4 +1,9 @@
 {
+  "ADMIN_ROLE": 0,
+  "USER_ROLE": 1,
+  "PENDING_ORDER": 2,
+  "CANCELED_ORDER": 0,
+  "COMPLETED_ORDER": 1,
   "mongoDBLocalURL": "mongodb://127.0.0.1:27017/cloth-store?retryWrites=true&w=majority",
   "signUpSecret": "1cWRg7bbtgNn1pFXU60lW9wx51f8Rg1OX4iwZEd3hi6E7g39_15YAjR_N6IglYXw-pAWywxPyQv-H_NbrVcZ7Q",
   "logInSecret": "ksgKAh9hYqhEpgdTPQVuZW4kP6LKX4E1+KXiAt0tc3b65bMxGCxwinUMiebuPb/RTRMY91X9wxkI1tgB+AZgug==",

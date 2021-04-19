@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken');
 const config = require('../../config/default.json');
 
-module.exports = function(req, res, next) {
+module.exports = function (req, res, next) {
   // Get token from header
   const token = req.header('x-auth-token');
   if (!token) {
     return res.status(400).json({
-      errors: [{ msg: 'You have to login to perform this action!' }],
+      message: 'You have to login to perform this action!'
     });
   }
 
@@ -18,7 +18,7 @@ module.exports = function(req, res, next) {
   } catch (error) {
     // 401: Unauthorized
     return res.status(401).json({
-      errors: [{ msg: 'Token is invalid!' }],
+      message: 'Token is invalid!'
     });
   }
 }
