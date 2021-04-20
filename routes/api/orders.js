@@ -7,6 +7,11 @@ const checkPermission = require('../../app/middlewares/checkPermission');
 
 const { validateOrder } = require('../../helpers/valid');
 
+// @route   GET api/orders/
+// @desc    Get all users's orders
+// @access  Private
+router.get('/', auth, OrderController.getAllUsersOrders);
+
 // @route   POST api/orders/
 // @desc    Order
 // @access  Private

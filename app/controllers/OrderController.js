@@ -10,6 +10,20 @@ const User = require('../models/User');
 const Product = require('../models/Product');
 
 class OrderController {
+  // @route   GET api/orders/
+  // @desc    Get all users's orders
+  // @access  Private
+  async getAllUsersOrders(req, res) {
+    try {
+      const orders = await Order.find({ userId: req.user._id }).populate({ path: "detail", populate: { path: "sizeId colorId" } });
+      if (!orders) {
+        return res.status(400).json({ message: 'No order found' });
+      }
+      return res.json(orders);
+    } catch (error) {
+      return res.status(500).send('Server error!');
+    }
+  }
 
   // @route   POST api/orders/
   // @desc    Order
@@ -34,7 +48,7 @@ class OrderController {
 
       const products = await Product.find({ '_id': { $in: productIdList } });
       if (!products) {
-        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+        return res.status(400).json({ message: 'No product found' });
       }
 
       const user = await User.findById(req.user._id);
@@ -68,6 +82,7 @@ class OrderController {
         }
       })
 
+      // Set up confirm order email for user
       const content = `
         <h1>Thanks for shopping on aware</h1>
         <h2>Visit aware page: <a href="http://localhost:3000">Aware</a></h2>
@@ -80,8 +95,24 @@ class OrderController {
         html: content,
       };
 
+      // Set up confirm order email for admin
+      const contentAdmin = `
+        <h1>New order is placed</h1>
+        <h2>Visit admin aware page for more detail: <a href="http://localhost:3000/admin">Aware</a></h2>
+      `;
+
+      const mailOptionsAdmin = {
+        from: config.email,
+        to: "17110290@student.hcmute.edu.vn",
+        subject: 'New order is placed',
+        html: contentAdmin,
+      };
+
       transporter
         .sendMail(mailOptions)
+        .then(() => {
+          return transporter.sendMail(mailOptionsAdmin);
+        })
         .then(() => {
           return res.json({
             message: 'Order success',
