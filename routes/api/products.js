@@ -12,8 +12,13 @@ const { validateAddCloth } = require('../../helpers/valid');
 // @access  Public
 router.get('/', ProductController.getAll);
 
+// @route   GET api/products/brands/:brandId
+// @desc    Get Products by brandId
+// @access  Public
+router.get('/brands/:brandId', ProductController.getAllProductsByBrand);
+
 // @route   GET api/products/types/:typeId
-// @desc    Get All Products By typeId
+// @desc    Get Products by typeId
 // @access  Public
 router.get('/types/:typeId', ProductController.getAllProductsByType);
 

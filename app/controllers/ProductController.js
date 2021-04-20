@@ -8,6 +8,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 const Product = require('../models/Product');
 const Type = require('../models/Type');
 const Category = require('../models/Category');
+const Brand = require('../models/Brand');
 
 class ProductController {
   // @route   GET api/products/
@@ -46,6 +47,27 @@ class ProductController {
       if (!products) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
+      return res.json(products);
+    } catch (error) {
+      return res.status(500).send('Server error');
+    }
+  }
+
+  // @route   GET api/products/brands/:brandId
+  // @desc    Get Products by brandId
+  // @access  Public
+  async getAllProductsByBrand(req, res) {
+    try {
+      const brand = await Brand.findById(req.params.brandId);
+      if (!brand) {
+        return res.status(400).json({ message: 'Brand not found' });
+      }
+
+      const products = await Product.find({ brandId: brand._id }).limit(4);
+      if (!products) {
+        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+      }
+
       return res.json(products);
     } catch (error) {
       return res.status(500).send('Server error');
