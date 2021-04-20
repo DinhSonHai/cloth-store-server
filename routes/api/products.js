@@ -8,9 +8,14 @@ const checkPermission = require('../../app/middlewares/checkPermission');
 const { validateAddCloth } = require('../../helpers/valid');
 
 // @route   GET api/products/
-// @desc    Get All Clothes
+// @desc    Get All Products
 // @access  Public
 router.get('/', ProductController.getAll);
+
+// @route   GET api/products/types/:typeId
+// @desc    Get All Products By typeId
+// @access  Public
+router.get('/types/:typeId', ProductController.getAllProductsByType);
 
 // @route   POST api/products/carts
 // @desc    Get Product Info in Carts

@@ -12,6 +12,11 @@ const { validateAddCategory } = require('../../helpers/valid');
 // @access  Public
 router.get('/', CategoryController.getAll);
 
+// @route   GET api/categories/types/:typeId
+// @desc    Get All Categories by type
+// @access  Public
+router.get('/types/:typeId', CategoryController.getAllCategoriesByType);
+
 // @route   GET api/categories/:categoryId
 // @desc    Get Category by Id
 // @access  Public

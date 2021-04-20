@@ -6,6 +6,8 @@ const _ = require('lodash');
 const ObjectId = require('mongoose').Types.ObjectId;
 
 const Product = require('../models/Product');
+const Type = require('../models/Type');
+const Category = require('../models/Category');
 
 class ProductController {
   // @route   GET api/products/
@@ -14,6 +16,33 @@ class ProductController {
   async getAll(req, res) {
     try {
       const products = await Product.find({});
+      if (!products) {
+        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+      }
+      return res.json(products);
+    } catch (error) {
+      return res.status(500).send('Server error');
+    }
+  }
+
+  // @route   GET api/products/types/:typeId
+  // @desc    Get All Products By typeId
+  // @access  Public
+  async getAllProductsByType(req, res) {
+    try {
+      const type = await Type.findById(req.params.typeId);
+      if (!type) {
+        return res.status(400).json({ message: 'Type not found' });
+      }
+
+      const categories = await Category.find({ typeId: req.params.typeId });
+      if (!categories) {
+        return res.status(400).json({ message: 'No category found' });
+      }
+
+      const categoryList = categories.map(category => category._id);
+
+      const products = await Product.find({ 'categories': { $in: categoryList } });
       if (!products) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
@@ -46,7 +75,7 @@ class ProductController {
   // @access  Public
   async getById(req, res) {
     try {
-      const product = await Product.findById(req.params.productId).populate('sizes colors').populate({ path: 'reviews', populate: { path: 'userId' }});
+      const product = await Product.findById(req.params.productId).populate('sizes colors').populate({ path: 'reviews', populate: { path: 'userId' } });
       if (!product) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }

@@ -6,6 +6,7 @@ const sizes = require('./api/sizes');
 const colors = require('./api/colors');
 const orders = require('./api/orders');
 const collections = require('./api/collections');
+const types = require('./api/types');
 
 function route(app) {
   // Auth routes
@@ -31,6 +32,9 @@ function route(app) {
 
   // Collection routes
   app.use('/api/collections', collections);
+
+  // Type routes
+  app.use('/api/types', types);
 }
 
 module.exports = route;

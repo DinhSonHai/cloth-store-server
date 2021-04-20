@@ -22,6 +22,21 @@ class CategoryController {
     }
   }
 
+  // @route   GET api/categories/types/:typeId
+  // @desc    Get All Categories by type
+  // @access  Public
+  async getAllCategoriesByType(req, res) {
+    try {
+      const categories = await Category.find({ typeId: req.params.typeId });
+      if (!categories) {
+        return res.status(400).json({ errors: [{ msg: 'No categories found' }] });
+      }
+      return res.json(categories);
+    } catch (error) {
+      return res.status(500).send('Server error');
+    }
+  }
+
   // @route   GET api/categories/:categoryId
   // @desc    Get Category by Id
   // @access  Public
