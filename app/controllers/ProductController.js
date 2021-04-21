@@ -30,7 +30,37 @@ class ProductController {
   // @desc    Get All Products By typeId
   // @access  Public
   async getAllProductsByType(req, res) {
+    const { categoryId, sort } = req.query;
     try {
+      if (categoryId) {
+        if (sort) {
+          if (sort === 'name') {
+            const products = await Product.find({ 'categories': categoryId }).sort({ 'name': 'asc' });
+            if (!products) {
+              return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+            }
+            return res.json(products);
+          }
+          if (sort === "asc") {
+            const products = await Product.find({ 'categories': categoryId }).sort({ 'price': 'asc' });
+            if (!products) {
+              return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+            }
+            return res.json(products);
+          }
+          const products = await Product.find({ 'categories': categoryId }).sort({ 'price': 'desc' });
+          if (!products) {
+            return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+          }
+          return res.json(products);
+        }
+        const products = await Product.find({ 'categories': categoryId }).sort({ 'price': 'asc' });
+        if (!products) {
+          return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+        }
+        return res.json(products);
+      }
+
       const type = await Type.findById(req.params.typeId);
       if (!type) {
         return res.status(400).json({ message: 'Type not found' });
@@ -43,7 +73,28 @@ class ProductController {
 
       const categoryList = categories.map(category => category._id);
 
-      const products = await Product.find({ 'categories': { $in: categoryList } });
+      if (sort) {
+        if (sort === "name") {
+          const products = await Product.find({ 'categories': { $in: categoryList } }).sort({ 'name': 'asc' });
+          if (!products) {
+            return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+          }
+          return res.json(products);
+        }
+        if (sort === "asc") {
+          const products = await Product.find({ 'categories': { $in: categoryList } }).sort({ 'price': 'asc' });
+          if (!products) {
+            return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+          }
+          return res.json(products);
+        }
+        const products = await Product.find({ 'categories': { $in: categoryList } }).sort({ 'price': 'desc' });
+        if (!products) {
+          return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+        }
+        return res.json(products);
+      }
+      const products = await Product.find({ 'categories': { $in: categoryList } }).sort({ 'price': 'asc' });
       if (!products) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
@@ -53,17 +104,17 @@ class ProductController {
     }
   }
 
-  // @route   GET api/products/brands/:brandId
-  // @desc    Get Products by brandId
+  // @route   GET api/products/brands/:productId
+  // @desc    Get Products by brand
   // @access  Public
   async getAllProductsByBrand(req, res) {
     try {
-      const brand = await Brand.findById(req.params.brandId);
-      if (!brand) {
-        return res.status(400).json({ message: 'Brand not found' });
+      const product = await Product.findById(req.params.productId);
+      if (!product) {
+        return res.status(400).json({ message: 'Product not found' });
       }
 
-      const products = await Product.find({ brandId: brand._id }).limit(4);
+      const products = await Product.find({ brandId: product.brandId, _id: { $ne: product._id } }).limit(4);
       if (!products) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
@@ -97,7 +148,7 @@ class ProductController {
   // @access  Public
   async getById(req, res) {
     try {
-      const product = await Product.findById(req.params.productId).populate('sizes colors').populate({ path: 'reviews', populate: { path: 'userId' } });
+      const product = await Product.findById(req.params.productId).populate('sizes colors brandId').populate({ path: 'reviews', populate: { path: 'userId' } });
       if (!product) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }

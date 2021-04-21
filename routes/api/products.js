@@ -12,10 +12,10 @@ const { validateAddCloth } = require('../../helpers/valid');
 // @access  Public
 router.get('/', ProductController.getAll);
 
-// @route   GET api/products/brands/:brandId
-// @desc    Get Products by brandId
+// @route   GET api/products/brands/:productId
+// @desc    Get Products by brand
 // @access  Public
-router.get('/brands/:brandId', ProductController.getAllProductsByBrand);
+router.get('/brands/:productId', ProductController.getAllProductsByBrand);
 
 // @route   GET api/products/types/:typeId
 // @desc    Get Products by typeId
