@@ -46,13 +46,13 @@ class ProductController {
     let query = { $text: { $search: q } };
 
     try {
-      const products = await Product.find(query).sort(sortValue);
-      // if (categoryId) {
-
-      // }
+      const products = await Product.find(query).populate('categories').sort(sortValue);
       if (!products) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
+      // if (categoryId) {
+
+      // }
       return res.json(products);
 
     } catch (error) {
@@ -76,28 +76,26 @@ class ProductController {
       sortValue = { 'price': 'desc' };
     }
 
+    let query = {};
+
     try {
       if (categoryId) {
-        const products = await Product.find({ 'categories': categoryId }).sort(sortValue);
-        if (!products) {
-          return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+        // Get products by categoryId
+        query = { 'categories': categoryId };
+      }
+      else {
+        // Get products by typeId  
+        const categories = await Category.find({ typeId: req.params.typeId });
+        if (!categories) {
+          return res.status(400).json({ message: 'No category found' });
         }
-        return res.json(products);
+
+        const categoryList = categories.map(category => category._id);
+
+        query = { 'categories': { $in: categoryList } };
       }
 
-      const type = await Type.findById(req.params.typeId);
-      if (!type) {
-        return res.status(400).json({ message: 'Type not found' });
-      }
-
-      const categories = await Category.find({ typeId: req.params.typeId });
-      if (!categories) {
-        return res.status(400).json({ message: 'No category found' });
-      }
-
-      const categoryList = categories.map(category => category._id);
-
-      const products = await Product.find({ 'categories': { $in: categoryList } }).sort(sortValue);
+      const products = await Product.find(query).sort(sortValue);
       if (!products) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
