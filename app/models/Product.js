@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 
 const ProductSchema = new Schema({
   photos: [{ type: String, trim: true, require: true }],
-  name: { type: String, require: true, trim: true },
+  name: { type: String, require: true, trim: true, text: true },
   categories: [{ type: Schema.Types.ObjectId, ref: 'category', require: true }],
   brandId: { type: Schema.Types.ObjectId, ref: 'brand', require: true },
   price: { type: Number, require: true },
@@ -17,7 +17,7 @@ const ProductSchema = new Schema({
   reviews: {
     type: [
       {
-        type: Schema.Types.ObjectId, 
+        type: Schema.Types.ObjectId,
         ref: 'review'
       }
     ],

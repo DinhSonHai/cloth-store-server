@@ -10,22 +10,27 @@ const { validateAddCloth } = require('../../helpers/valid');
 // @route   GET api/products/
 // @desc    Get All Products
 // @access  Public
-router.get('/', ProductController.getAll);
+router.get('/', ProductController.getAllProducts);
+
+// @route   GET api/products/search
+// @desc    Search Products
+// @access  Public
+router.get('/search', ProductController.searchProducts);
 
 // @route   GET api/products/brands/:productId
 // @desc    Get Products by brand
 // @access  Public
-router.get('/brands/:productId', ProductController.getAllProductsByBrand);
+router.get('/brands/:productId', ProductController.getProductsByBrand);
 
 // @route   GET api/products/types/:typeId
 // @desc    Get Products by typeId
 // @access  Public
-router.get('/types/:typeId', ProductController.getAllProductsByType);
+router.get('/types/:typeId', ProductController.getProductsByType);
 
 // @route   POST api/products/carts
 // @desc    Get Product Info in Carts
 // @access  public
-router.post('/carts', ProductController.getAllProductsInCart);
+router.post('/carts', ProductController.getProductsInCart);
 
 // @route   GET api/products/:productId
 // @desc    Get Cloth by Id

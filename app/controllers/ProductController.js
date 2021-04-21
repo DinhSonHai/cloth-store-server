@@ -14,7 +14,7 @@ class ProductController {
   // @route   GET api/products/
   // @desc    Get All Clothes
   // @access  Public
-  async getAll(req, res) {
+  async getAllProducts(req, res) {
     try {
       const products = await Product.find({});
       if (!products) {
@@ -26,35 +26,59 @@ class ProductController {
     }
   }
 
+  // @route   GET api/products/search
+  // @desc    Search Products
+  // @access  Public
+  async searchProducts(req, res) {
+    const { q, sort } = req.query;
+
+    let sortValue = { 'createdAt': 'desc' };
+    if (sort === 'name') {
+      sortValue = { 'name': 'asc' };
+    }
+    else if (sort === 'asc') {
+      sortValue = { 'price': 'asc' };
+    }
+    else if (sort === 'desc') {
+      sortValue = { 'price': 'desc' };
+    }
+
+    let query = { $text: { $search: q } };
+
+    try {
+      const products = await Product.find(query).sort(sortValue);
+      // if (categoryId) {
+
+      // }
+      if (!products) {
+        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+      }
+      return res.json(products);
+
+    } catch (error) {
+      return res.status(500).send('Server error');
+    }
+  }
+
   // @route   GET api/products/types/:typeId
   // @desc    Get All Products By typeId
   // @access  Public
-  async getAllProductsByType(req, res) {
+  async getProductsByType(req, res) {
     const { categoryId, sort } = req.query;
+    let sortValue = { 'createdAt': 'desc' };
+    if (sort === 'name') {
+      sortValue = { 'name': 'asc' };
+    }
+    else if (sort === 'asc') {
+      sortValue = { 'price': 'asc' };
+    }
+    else if (sort === 'desc') {
+      sortValue = { 'price': 'desc' };
+    }
+
     try {
       if (categoryId) {
-        if (sort) {
-          if (sort === 'name') {
-            const products = await Product.find({ 'categories': categoryId }).sort({ 'name': 'asc' });
-            if (!products) {
-              return res.status(400).json({ errors: [{ msg: 'No product found' }] });
-            }
-            return res.json(products);
-          }
-          if (sort === "asc") {
-            const products = await Product.find({ 'categories': categoryId }).sort({ 'price': 'asc' });
-            if (!products) {
-              return res.status(400).json({ errors: [{ msg: 'No product found' }] });
-            }
-            return res.json(products);
-          }
-          const products = await Product.find({ 'categories': categoryId }).sort({ 'price': 'desc' });
-          if (!products) {
-            return res.status(400).json({ errors: [{ msg: 'No product found' }] });
-          }
-          return res.json(products);
-        }
-        const products = await Product.find({ 'categories': categoryId }).sort({ 'price': 'asc' });
+        const products = await Product.find({ 'categories': categoryId }).sort(sortValue);
         if (!products) {
           return res.status(400).json({ errors: [{ msg: 'No product found' }] });
         }
@@ -73,28 +97,7 @@ class ProductController {
 
       const categoryList = categories.map(category => category._id);
 
-      if (sort) {
-        if (sort === "name") {
-          const products = await Product.find({ 'categories': { $in: categoryList } }).sort({ 'name': 'asc' });
-          if (!products) {
-            return res.status(400).json({ errors: [{ msg: 'No product found' }] });
-          }
-          return res.json(products);
-        }
-        if (sort === "asc") {
-          const products = await Product.find({ 'categories': { $in: categoryList } }).sort({ 'price': 'asc' });
-          if (!products) {
-            return res.status(400).json({ errors: [{ msg: 'No product found' }] });
-          }
-          return res.json(products);
-        }
-        const products = await Product.find({ 'categories': { $in: categoryList } }).sort({ 'price': 'desc' });
-        if (!products) {
-          return res.status(400).json({ errors: [{ msg: 'No product found' }] });
-        }
-        return res.json(products);
-      }
-      const products = await Product.find({ 'categories': { $in: categoryList } }).sort({ 'price': 'asc' });
+      const products = await Product.find({ 'categories': { $in: categoryList } }).sort(sortValue);
       if (!products) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
@@ -107,7 +110,7 @@ class ProductController {
   // @route   GET api/products/brands/:productId
   // @desc    Get Products by brand
   // @access  Public
-  async getAllProductsByBrand(req, res) {
+  async getProductsByBrand(req, res) {
     try {
       const product = await Product.findById(req.params.productId);
       if (!product) {
@@ -128,7 +131,7 @@ class ProductController {
   // @route   POST api/products/carts
   // @desc    Get Product Info in Carts
   // @access  public
-  async getAllProductsInCart(req, res) {
+  async getProductsInCart(req, res) {
     const { productIdList } = req.body;
     try {
       const products = await Product.find({ '_id': { $in: productIdList } }).populate('sizes colors');
