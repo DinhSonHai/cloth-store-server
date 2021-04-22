@@ -161,7 +161,7 @@ class AuthController {
             userId = decoded.user._id;
           }
           if (err) {
-            return res.status(401).json({ message: 'Link reset password expired' });
+            return res.status(401).json({ message: 'Link reset password is invalid or expired' });
           }
         });
 
@@ -186,7 +186,7 @@ class AuthController {
 
       await user.save();
 
-      return res.json({ message: 'Your password have been resetted' });
+      return res.json({ message: 'Your password has been resetted' });
     } catch (error) {
       return res.status(500).send('Server Error');
     }
@@ -195,14 +195,14 @@ class AuthController {
   // @route   PUT api/auth/password
   // @desc    Change user password
   // @access  Private
-  async changePassWord(req, res) {
+  async changePassword(req, res) {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ message: errors.array()[0] });
     }
 
-    const { currentPassWord, newPassWord } = req.body;
+    const { currentPassword, newPassword } = req.body;
 
     try {
       let user = await User.findById(req.user._id);
@@ -214,7 +214,7 @@ class AuthController {
       }
 
       // Check if password match
-      const isMatch = await user.checkPassWord(currentPassWord);
+      const isMatch = await user.checkPassWord(currentPassword);
       if (!isMatch) {
         return res.status(400).json({
           message: 'Your password is invalid'
@@ -223,7 +223,7 @@ class AuthController {
 
       // Encrypt password
       const salt = await bcrypt.genSalt(10);
-      const password = await bcrypt.hash(newPassWord, salt);
+      const password = await bcrypt.hash(newPassword, salt);
 
       user.password = password;
 

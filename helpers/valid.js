@@ -40,12 +40,12 @@ module.exports.validateChangeInfo = [
 
 // Validate change password data
 module.exports.validateChangePassWord = [
-  check('currentPassWord')
+  check('currentPassword')
     .isLength({
       min: 6
     })
     .withMessage('Your password must be more than 6 characters'),
-  check('newPassWord')
+  check('newPassword')
     .isLength({
       min: 6
     })

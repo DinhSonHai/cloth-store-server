@@ -30,7 +30,7 @@ router.put('/resetpassword', validateResetPassWord, AuthController.resetPassword
 // @route   PUT api/auth/password
 // @desc    Change user password
 // @access  Private
-router.put('/password', [auth, validateChangePassWord], AuthController.changePassWord);
+router.put('/password', [auth, validateChangePassWord], AuthController.changePassword);
 
 // @route   POST api/auth/login
 // @desc    Log in customer account
