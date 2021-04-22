@@ -26,6 +26,45 @@ class AuthController {
     }
   }
 
+  // @route   PUT api/auth/info
+  // @desc    Change user info
+  // @access  Private
+  async changeInfo(req, res) {
+    // Validate request body
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ error: errors.array()[0] });
+    }
+
+    const { name, email } = req.body;
+
+    try {
+      const userCheck = await User.findOne({ email }).select(['-password', '-resetPasswordLink']);
+
+      if (userCheck) {
+        return res.status(404).json({
+          message: 'Can not use this email'
+        });
+      }
+
+      let user = await User.findById(req.user._id).select(['-password', '-resetPasswordLink']);
+
+      if (!user) {
+        return res.status(404).json({
+          message: 'User not found'
+        });
+      }
+
+      user.name = name;
+      user.email = email;
+
+      await user.save();
+      return res.json({ message: 'Update info success' });
+    } catch (error) {
+      return res.status(500).send('Server Error');
+    }
+  }
+
   // @route   POST api/auth/login
   // @desc    Log in customer account
   // @access  Public

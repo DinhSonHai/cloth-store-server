@@ -30,7 +30,7 @@ class ProductController {
   // @desc    Search Products
   // @access  Public
   async searchProducts(req, res) {
-    const { q, sort } = req.query;
+    const { q, categoryId, sort } = req.query;
 
     let sortValue = { 'createdAt': 'desc' };
     if (sort === 'name') {
@@ -46,14 +46,33 @@ class ProductController {
     let query = { $text: { $search: q } };
 
     try {
-      const products = await Product.find(query).populate('categories').sort(sortValue);
+      let products = await Product.find(query).populate('categories').sort(sortValue);
       if (!products) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
-      // if (categoryId) {
 
-      // }
-      return res.json(products);
+      // Get all categories from products
+      let categories = products.map(product => product.categories);
+
+      // Flatten array inside array
+      categories = [].concat.apply([], categories);
+
+      // Remove duplicate category
+      categories = categories.reduce((acc, current) => {
+        const category = acc.find(item => item._id === current._id);
+        if (!category) {
+          return acc.concat([current]);
+        }
+        else {
+          return acc;
+        }
+      }, []);
+
+      if (categoryId) {
+        products = products.filter(product => product.categories.find(category => category._id.toString() === categoryId));
+      }
+
+      return res.json({ products, categories });
 
     } catch (error) {
       return res.status(500).send('Server error');

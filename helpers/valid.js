@@ -28,6 +28,16 @@ module.exports.validateLogIn = [
     .withMessage('Your password must be more than 6 characters')
 ]
 
+// Validate change info data
+module.exports.validateChangeInfo = [
+  check('name')
+    .notEmpty()
+    .withMessage('Please enter a valid name'),
+  check('email')
+    .isEmail()
+    .withMessage('Please enter a valid email')
+]
+
 // Validate add cloth data
 module.exports.validateAddCloth = [
   body('photos')
