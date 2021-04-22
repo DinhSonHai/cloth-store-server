@@ -52,6 +52,19 @@ module.exports.validateChangePassWord = [
     .withMessage('Your password must be more than 6 characters')
 ]
 
+
+// Validate reset password data
+module.exports.validateResetPassWord = [
+  check('password')
+    .isLength({
+      min: 6
+    })
+    .withMessage('Your password must be more than 6 characters'),
+  check('resetPasswordLink')
+    .notEmpty()
+    .withMessage('Reset password link is invalid')
+]
+
 // Validate change password data
 module.exports.validateForgotPassWord = [
   check('email')

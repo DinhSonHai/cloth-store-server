@@ -93,7 +93,7 @@ class AuthController {
         },
       };
 
-      const token = await jwt.sign(payload, config.logInSecret, {
+      const token = jwt.sign(payload, config.forgotPasswordSecret, {
         expiresIn: '1d'
       });
 
@@ -135,6 +135,58 @@ class AuthController {
             errors: [{ msg: err.message }]
           });
         });
+    } catch (error) {
+      return res.status(500).send('Server Error');
+    }
+  }
+
+  // @route   PUT api/auth/resetpassword
+  // @desc    Reset user's password
+  // @access  Public
+  async resetPassword(req, res) {
+    // Validate request body
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0] });
+    }
+
+    const { password, resetPasswordLink } = req.body;
+
+    try {
+      let userId = '';
+
+      jwt.verify(resetPasswordLink, config.forgotPasswordSecret,
+        (err, decoded) => {
+          if (decoded) {
+            userId = decoded.user._id;
+          }
+          if (err) {
+            return res.status(401).json({ message: 'Link reset password expired' });
+          }
+        });
+
+      let user = await User.findById(userId);
+
+      // Check if reset link is used
+      if (!user.resetPasswordLink) {
+        return res.status(400).json({ message: 'Reset link has been used' });
+      }
+
+      // Check if reset password link not match
+      if (user.resetPasswordLink !== resetPasswordLink) {
+        return res.status(400).json({ message: 'Invalid reset password link' });
+      }
+
+      // Encode password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      user.password = hashedPassword;
+      user.resetPasswordLink = '';
+
+      await user.save();
+
+      return res.json({ message: 'Your password have been resetted' });
     } catch (error) {
       return res.status(500).send('Server Error');
     }
@@ -221,7 +273,7 @@ class AuthController {
       };
 
       // Generate token
-      const token = await jwt.sign(payload, config.logInSecret, {
+      const token = jwt.sign(payload, config.logInSecret, {
         expiresIn: '7d'
       });
 
@@ -345,7 +397,7 @@ class AuthController {
       };
 
       // Generate token
-      const token = await jwt.sign(payload, config.logInSecret, {
+      const token = jwt.sign(payload, config.logInSecret, {
         expiresIn: '7d'
       });
 
