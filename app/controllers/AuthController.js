@@ -17,7 +17,7 @@ class AuthController {
       const user = await User.findById(req.user._id).select(['-password', '-resetPasswordLink']);
       if (!user) {
         return res.status(404).json({
-          errors: [{ msg: 'User not exist' }],
+          message: 'User not exist'
         });
       }
       return res.json(user);
@@ -33,21 +33,13 @@ class AuthController {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ error: errors.array()[0] });
+      return res.status(400).json({ message: errors.array()[0] });
     }
 
     const { name, email } = req.body;
 
     try {
-      const userCheck = await User.findOne({ email }).select(['-password', '-resetPasswordLink']);
-
-      if (userCheck) {
-        return res.status(404).json({
-          message: 'Can not use this email'
-        });
-      }
-
-      let user = await User.findById(req.user._id).select(['-password', '-resetPasswordLink']);
+      let user = await User.findById(req.user._id);
 
       if (!user) {
         return res.status(404).json({
@@ -55,11 +47,136 @@ class AuthController {
         });
       }
 
+      if (user.email !== email) {
+        const userCheck = await User.findOne({ email });
+
+        if (userCheck) {
+          return res.status(400).json({
+            message: 'Can not use this email'
+          });
+        }
+      }
+
       user.name = name;
       user.email = email;
 
       await user.save();
       return res.json({ message: 'Update info success' });
+    } catch (error) {
+      return res.status(500).send('Server Error');
+    }
+  }
+  // @route   PUT api/auth/forgotpassword
+  // @desc    Send mail to user to reset password
+  // @access  Public
+  async forgotPassword(req, res) {
+    // Validate request body
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0] });
+    }
+
+    const { email } = req.body;
+
+    try {
+      let user = await User.findOne({ email });
+
+      if (!user) {
+        return res.status(404).json({
+          message: 'User with this email not found'
+        });
+      }
+
+      const payload = {
+        user: {
+          _id: user._id,
+        },
+      };
+
+      const token = await jwt.sign(payload, config.logInSecret, {
+        expiresIn: '1d'
+      });
+
+      await user.updateOne({
+        resetPasswordLink: token,
+      });
+
+      // Send forgot password email
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: config.email,
+          pass: config.passWord
+        }
+      })
+
+      const content = `
+        <h1>You have requested reset your password at aware</h1>
+        <h2>Reset your password at: <a href=${config.CLIENT_URL}/auth/resetpassword/${token}>Reset Password</a></h2>
+        <h2>Visit aware page: <a href=${config.CLIENT_URL}>Aware</a></h2>
+      `;
+
+      const mailOptions = {
+        from: config.email,
+        to: email,
+        subject: 'Reset aware account password',
+        html: content,
+      };
+
+      transporter
+        .sendMail(mailOptions)
+        .then(() => {
+          return res.json({
+            message: 'Visit your email to reset your password, link expires in 1 day'
+          })
+        })
+        .catch((err) => {
+          return res.status(400).json({
+            errors: [{ msg: err.message }]
+          });
+        });
+    } catch (error) {
+      return res.status(500).send('Server Error');
+    }
+  }
+
+  // @route   PUT api/auth/password
+  // @desc    Change user password
+  // @access  Private
+  async changePassWord(req, res) {
+    // Validate request body
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0] });
+    }
+
+    const { currentPassWord, newPassWord } = req.body;
+
+    try {
+      let user = await User.findById(req.user._id);
+
+      if (!user) {
+        return res.status(404).json({
+          message: 'User not found'
+        });
+      }
+
+      // Check if password match
+      const isMatch = await user.checkPassWord(currentPassWord);
+      if (!isMatch) {
+        return res.status(400).json({
+          message: 'Your password is invalid'
+        })
+      }
+
+      // Encrypt password
+      const salt = await bcrypt.genSalt(10);
+      const password = await bcrypt.hash(newPassWord, salt);
+
+      user.password = password;
+
+      await user.save();
+      return res.json({ message: 'Update password success' });
     } catch (error) {
       return res.status(500).send('Server Error');
     }
@@ -104,7 +221,7 @@ class AuthController {
       };
 
       // Generate token
-      const token = jwt.sign(payload, config.logInSecret, {
+      const token = await jwt.sign(payload, config.logInSecret, {
         expiresIn: '7d'
       });
 
@@ -121,7 +238,7 @@ class AuthController {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ message: errors.array()[0] });
     }
 
     // Get data from body
@@ -131,7 +248,7 @@ class AuthController {
       // Check if email exist
       let user = await User.findOne({ email });
       if (user) {
-        return res.status(400).json({ errors: [{ msg: 'This email has already signed up' }] });
+        return res.status(400).json({ message: 'This email has already signed up' });
       }
 
       // Encrypt password
@@ -148,7 +265,7 @@ class AuthController {
       await user.save();
 
       // Without send mail
-      res.json({ msg: 'Thanks for register aware account' });
+      res.json({ message: 'Thanks for register aware account' });
 
       // Send sign up success email
       // const transporter = nodemailer.createTransport({
@@ -228,7 +345,7 @@ class AuthController {
       };
 
       // Generate token
-      const token = jwt.sign(payload, config.logInSecret, {
+      const token = await jwt.sign(payload, config.logInSecret, {
         expiresIn: '7d'
       });
 

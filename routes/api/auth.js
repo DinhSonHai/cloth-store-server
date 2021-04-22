@@ -5,7 +5,7 @@ const AuthController = require('../../app/controllers/AuthController');
 const auth = require('../../app/middlewares/auth');
 const checkPermission = require('../../app/middlewares/checkPermission');
 
-const { validateSignUp, validatelogIn, validateLogIn, validateChangeInfo } = require('../../helpers/valid');
+const { validateSignUp, validateLogIn, validateChangeInfo, validateChangePassWord, validateForgotPassWord } = require('../../helpers/valid');
 
 // @route   GET api/auth/user
 // @desc    Get user data
@@ -16,6 +16,16 @@ router.get('/', auth, AuthController.getUser);
 // @desc    Change user info
 // @access  Private
 router.put('/info', [auth, validateChangeInfo], AuthController.changeInfo);
+
+// @route   PUT api/auth/forgotpassword
+// @desc    Send mail to user to reset password
+// @access  Public
+router.put('/forgotpassword', validateForgotPassWord, AuthController.forgotPassword);
+
+// @route   PUT api/auth/password
+// @desc    Change user password
+// @access  Private
+router.put('/password', [auth, validateChangePassWord], AuthController.changePassWord);
 
 // @route   POST api/auth/login
 // @desc    Log in customer account

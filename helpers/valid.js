@@ -38,6 +38,27 @@ module.exports.validateChangeInfo = [
     .withMessage('Please enter a valid email')
 ]
 
+// Validate change password data
+module.exports.validateChangePassWord = [
+  check('currentPassWord')
+    .isLength({
+      min: 6
+    })
+    .withMessage('Your password must be more than 6 characters'),
+  check('newPassWord')
+    .isLength({
+      min: 6
+    })
+    .withMessage('Your password must be more than 6 characters')
+]
+
+// Validate change password data
+module.exports.validateForgotPassWord = [
+  check('email')
+    .isEmail()
+    .withMessage('Please enter a valid email')
+]
+
 // Validate add cloth data
 module.exports.validateAddCloth = [
   body('photos')
