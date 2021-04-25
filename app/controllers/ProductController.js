@@ -26,6 +26,21 @@ class ProductController {
     }
   }
 
+  // @route   GET api/products/admin
+  // @desc    Get All Products for admin page with filter and pagination
+  // @access  Public
+  async getAllProductsForAdmin(req, res) {
+    try {
+      const products = await Product.find({}).limit(6).populate('categories');
+      if (!products) {
+        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+      }
+      return res.json(products);
+    } catch (error) {
+      return res.status(500).send('Server error');
+    }
+  }
+
   // @route   GET api/products/search
   // @desc    Search Products
   // @access  Public

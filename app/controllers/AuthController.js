@@ -14,13 +14,30 @@ class AuthController {
   // @access  Private
   async getUser(req, res) {
     try {
-      const user = await User.findById(req.user._id).select(['-password', '-resetPasswordLink']);
+      const user = await User.findById(req.user._id).select(['-password', '-resetPasswordLink', '-role']);
       if (!user) {
         return res.status(404).json({
           message: 'User not exist'
         });
       }
       return res.json(user);
+    } catch (error) {
+      return res.status(500).send('Server Error');
+    }
+  }
+
+  // @route   GET api/auth/admin
+  // @desc    Get admin data
+  // @access  Private
+  async getAdmin(req, res) {
+    try {
+      const admin = await Admin.findById(req.user._id).select(['-password', '-resetPasswordLink', '-role']);
+      if (!admin) {
+        return res.status(404).json({
+          message: 'Invalid action'
+        });
+      }
+      return res.json(admin);
     } catch (error) {
       return res.status(500).send('Server Error');
     }
@@ -365,7 +382,7 @@ class AuthController {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ message: errors.array()[0] });
     }
 
     // Get data from body
@@ -376,7 +393,7 @@ class AuthController {
       let admin = await Admin.findOne({ email });
       if (!admin) {
         return res.status(400).json({
-          errors: [{ msg: 'Your e-mail/password is invalid' }]
+          message: 'Your e-mail/password is invalid'
         })
       }
 
@@ -384,7 +401,7 @@ class AuthController {
       const isMatch = await admin.checkPassWord(password);
       if (!isMatch) {
         return res.status(400).json({
-          errors: [{ msg: 'Your e-mail/password is invalid' }]
+          message: 'Your e-mail/password is invalid'
         })
       }
 

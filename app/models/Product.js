@@ -26,6 +26,8 @@ const ProductSchema = new Schema({
   starRatings: { type: Number, default: 0, min: 0, max: 5 },
   totalStars: { type: Number, default: 0 },
   reviewsCount: { type: Number, default: 0 },
+  sold: { type: Number, default: 0 },
+  profit: { type: Number, default: 0 },
   createdAt: { type: Date, default: dayjs().toISOString() }
 });
 

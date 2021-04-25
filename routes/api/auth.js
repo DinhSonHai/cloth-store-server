@@ -7,10 +7,15 @@ const checkPermission = require('../../app/middlewares/checkPermission');
 
 const { validateSignUp, validateLogIn, validateChangeInfo, validateChangePassWord, validateForgotPassWord, validateResetPassWord } = require('../../helpers/valid');
 
-// @route   GET api/auth/user
+// @route   GET api/auth
 // @desc    Get user data
 // @access  Private
 router.get('/', auth, AuthController.getUser);
+
+// @route   GET api/auth/admin
+// @desc    Get admin data
+// @access  Private
+router.get('/admin', auth, AuthController.getAdmin);
 
 // @route   PUT api/auth/info
 // @desc    Change user info
