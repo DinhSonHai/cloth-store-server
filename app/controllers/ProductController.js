@@ -31,7 +31,7 @@ class ProductController {
   // @access  Public
   async getAllProductsForAdmin(req, res) {
     try {
-      const products = await Product.find({}).limit(6).populate('categories');
+      const products = await Product.find({}).populate('categories');
       // const products = await Product.find({}).populate('categories');
 
       if (!products) {
@@ -49,7 +49,7 @@ class ProductController {
   async searchProducts(req, res) {
     const { q, categoryId, sort } = req.query;
 
-    let sortValue = { 'createdAt': 'desc' };
+    let sortValue = { 'price': 'asc' };
     if (sort === 'name') {
       sortValue = { 'name': 'asc' };
     }
@@ -101,7 +101,7 @@ class ProductController {
   // @access  Public
   async getProductsByType(req, res) {
     const { categoryId, sort } = req.query;
-    let sortValue = { 'createdAt': 'desc' };
+    let sortValue = { 'price': 'asc' };
     if (sort === 'name') {
       sortValue = { 'name': 'asc' };
     }
