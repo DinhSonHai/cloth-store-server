@@ -145,7 +145,41 @@ class OrderController {
       if (order.status === config.PENDING_ORDER) {
         order.status = config.CANCELED_ORDER;
         await order.save();
-        return res.json({ message: 'Cancel order success' });
+
+        // Send order success email
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: config.email,
+            pass: config.passWord
+          }
+        })
+
+        // Set up email
+        const content = `
+        <h1>Order ${order.orderId} is cancelled</h1>
+        <h2>Visit admin aware page for more detail: <a href="http://localhost:3000/admin">Aware</a></h2>
+      `;
+
+        const mailOptions = {
+          from: config.email,
+          to: "17110290@student.hcmute.edu.vn",
+          subject: 'Order cancelled',
+          html: content,
+        };
+
+        transporter
+          .sendMail(mailOptions)
+          .then(() => {
+            return res.json({
+              message: 'Cancel order success',
+            });
+          })
+          .catch((err) => {
+            return res.status(400).json({
+              message: err.message
+            });
+          });
       }
 
       return res.json({ message: 'Can not perform this action' });

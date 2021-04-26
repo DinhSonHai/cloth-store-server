@@ -32,6 +32,8 @@ class ProductController {
   async getAllProductsForAdmin(req, res) {
     try {
       const products = await Product.find({}).limit(6).populate('categories');
+      // const products = await Product.find({}).populate('categories');
+
       if (!products) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
@@ -183,7 +185,7 @@ class ProductController {
   // @access  Public
   async getById(req, res) {
     try {
-      const product = await Product.findById(req.params.productId).populate('sizes colors brandId').populate({ path: 'reviews', populate: { path: 'userId' } });
+      const product = await Product.findById(req.params.productId).populate('sizes colors brandId categories').populate({ path: 'reviews', populate: { path: 'userId' } });
       if (!product) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
@@ -200,7 +202,7 @@ class ProductController {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ message: errors.array()[0].msg });
     }
 
     const { photos, name, categories, brandId, price, sizes, colors, quantity, description } = req.body;
@@ -211,7 +213,7 @@ class ProductController {
 
     try {
       await product.save();
-      return res.json({ msg: 'Add cloth success' });
+      return res.json({ message: 'Add cloth success' });
     } catch (error) {
       return res.status(500).send('Server error!');
     }
