@@ -218,6 +218,24 @@ class OrderController {
 
         await order.save();
 
+        const user = await User.findById(order.userId);
+
+        order.detail.map(item => {
+          const handle = async () => {
+            if (!user.purchasedProducts.find(purchasedProduct => purchasedProduct === item.productId)) {
+              user.purchasedProducts.push(item.productId);
+            }
+            const product = await Product.findById(item.productId);
+            product.sold = product.sold + item.quantity;
+            product.profit = product.profit + product.price * item.quantity;
+            product.quantity = product.quantity - item.quantity;
+            await product.save();
+          }
+          handle();
+        });
+
+        await user.save();
+
         return res.json({ message: 'Order marked as completed' });
       }
       return res.json({ message: 'Can not perform this action' });
