@@ -80,7 +80,7 @@ class ReviewController {
       product.reviews.push(review._id);
       product.reviewsCount = product.reviewsCount + 1;
       product.totalStars = reviews.reduce((total, currentValue) => total + currentValue.starRatings, 0);
-      product.starRatings = Math.round(product.totalStars / product.reviewsCount);
+      product.starRatings = Math.ceil(product.totalStars / product.reviewsCount);
 
       await product.save();
 

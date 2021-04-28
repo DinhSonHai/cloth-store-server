@@ -30,14 +30,34 @@ class ProductController {
   // @desc    Get All Products for admin page with filter and pagination
   // @access  Public
   async getAllProductsForAdmin(req, res) {
+    const { q, sort } = req.query;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const start = (page - 1) * limit;
+    const end = page * limit;
+
+    let sortValue = { 'createdAt': 'desc' };
+    if (sort === 'profit') {
+      sortValue = { 'profit': 'desc' };
+    }
+
+    let query = {};
+    if (q) {
+      query = { $text: { $search: q } };
+    }
+
     try {
-      const products = await Product.find({}).populate('categories');
-      // const products = await Product.find({}).populate('categories');
+      const products = await Product.find(query).populate('categories').sort(sortValue);
 
       if (!products) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
-      return res.json(products);
+
+      return res.json({
+        products: products.slice(start, end),
+        total: products.length
+      });
     } catch (error) {
       return res.status(500).send('Server error');
     }
@@ -47,7 +67,12 @@ class ProductController {
   // @desc    Search Products
   // @access  Public
   async searchProducts(req, res) {
-    const { q, categoryId, sort } = req.query;
+    const { q, categoryId, sort, size } = req.query;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const start = (page - 1) * limit;
+    const end = page * limit;
 
     let sortValue = { 'price': 'asc' };
     if (sort === 'name') {
@@ -61,6 +86,10 @@ class ProductController {
     }
 
     let query = { $text: { $search: q } };
+
+    if (size) {
+      query = { $text: { $search: q }, 'sizes': size };
+    }
 
     try {
       let products = await Product.find(query).populate('categories').sort(sortValue);
@@ -88,8 +117,11 @@ class ProductController {
       if (categoryId) {
         products = products.filter(product => product.categories.find(category => category._id.toString() === categoryId));
       }
-
-      return res.json({ products, categories });
+      return res.json({
+        products: products.slice(start, end),
+        total: products.length,
+        categories
+      });
 
     } catch (error) {
       return res.status(500).send('Server error');
@@ -100,7 +132,14 @@ class ProductController {
   // @desc    Get All Products By typeId
   // @access  Public
   async getProductsByType(req, res) {
-    const { categoryId, sort } = req.query;
+    const { categoryId, sort, size } = req.query;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const start = (page - 1) * limit;
+    const end = page * limit;
+
+    // Sort filter
     let sortValue = { 'price': 'asc' };
     if (sort === 'name') {
       sortValue = { 'name': 'asc' };
@@ -116,8 +155,13 @@ class ProductController {
 
     try {
       if (categoryId) {
-        // Get products by categoryId
-        query = { 'categories': categoryId };
+        if (size) {
+          query = { 'categories': categoryId, 'sizes': size };
+        }
+        else {
+          // Get products by categoryId
+          query = { 'categories': categoryId };
+        }
       }
       else {
         // Get products by typeId  
@@ -128,14 +172,22 @@ class ProductController {
 
         const categoryList = categories.map(category => category._id);
 
-        query = { 'categories': { $in: categoryList } };
+        if (size) {
+          query = { 'categories': { $in: categoryList }, 'sizes': size };
+        }
+        else {
+          query = { 'categories': { $in: categoryList } };
+        }
       }
 
       const products = await Product.find(query).sort(sortValue);
       if (!products) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
-      return res.json(products);
+      return res.json({
+        products: products.slice(start, end),
+        total: products.length
+      });
     } catch (error) {
       return res.status(500).send('Server error');
     }
@@ -240,7 +292,7 @@ class ProductController {
       product = _.extend(product, { photos, name, categories, brandId, price, sizes, colors, quantity, description });
 
       await product.save();
-      return res.json({ msg: 'Edit cloth success' });
+      return res.json({ message: 'Edit cloth success' });
     } catch (error) {
       return res.status(500).send('Server error!');
     }

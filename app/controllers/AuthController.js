@@ -53,7 +53,7 @@ class AuthController {
       return res.status(400).json({ message: errors.array()[0] });
     }
 
-    const { name, email } = req.body;
+    const { name } = req.body;
 
     try {
       let user = await User.findById(req.user._id);
@@ -64,18 +64,7 @@ class AuthController {
         });
       }
 
-      if (user.email !== email) {
-        const userCheck = await User.findOne({ email });
-
-        if (userCheck) {
-          return res.status(400).json({
-            message: 'Can not use this email'
-          });
-        }
-      }
-
       user.name = name;
-      user.email = email;
 
       await user.save();
       return res.json({ message: 'Update info success' });
@@ -291,7 +280,7 @@ class AuthController {
 
       // Generate token
       const token = jwt.sign(payload, config.logInSecret, {
-        expiresIn: '7d'
+        expiresIn: '2h'
       });
 
       return res.json({ token });
@@ -415,7 +404,7 @@ class AuthController {
 
       // Generate token
       const token = jwt.sign(payload, config.logInSecret, {
-        expiresIn: '7d'
+        expiresIn: '2h'
       });
 
       return res.json({ token });

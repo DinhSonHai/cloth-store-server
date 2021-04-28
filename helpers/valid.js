@@ -32,10 +32,7 @@ module.exports.validateLogIn = [
 module.exports.validateChangeInfo = [
   check('name')
     .notEmpty()
-    .withMessage('Please enter a valid name'),
-  check('email')
-    .isEmail()
-    .withMessage('Please enter a valid email')
+    .withMessage('Please enter a valid name')
 ]
 
 // Validate change password data
