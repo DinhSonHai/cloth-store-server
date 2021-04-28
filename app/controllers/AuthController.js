@@ -280,7 +280,7 @@ class AuthController {
 
       // Generate token
       const token = jwt.sign(payload, config.logInSecret, {
-        expiresIn: '2h'
+        expiresIn: '7d'
       });
 
       return res.json({ token });
@@ -404,7 +404,7 @@ class AuthController {
 
       // Generate token
       const token = jwt.sign(payload, config.logInSecret, {
-        expiresIn: '2h'
+        expiresIn: '7d'
       });
 
       return res.json({ token });

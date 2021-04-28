@@ -15,7 +15,7 @@ class OrderController {
   // @access  Private
   async getAllUsersOrders(req, res) {
     try {
-      const orders = await Order.find({ userId: req.user._id }).populate({ path: "detail", populate: { path: "sizeId colorId" } });
+      const orders = await Order.find({ userId: req.user._id }).populate({ path: "detail", populate: { path: "sizeId colorId" } }).sort({ 'orderedDate': 'desc' });
       if (!orders) {
         return res.status(400).json({ message: 'No order found' });
       }
@@ -192,14 +192,36 @@ class OrderController {
   // @desc    Get All Orders
   // @access  Private Admin
   async getAllOrders(req, res) {
+    const { q, sort } = req.query;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const start = (page - 1) * limit;
+    const end = page * limit;
+
+    let sortValue = { 'orderedDate': 'desc' };
+    // if (sort === 'profit') {
+    //   sortValue = { 'profit': 'desc' };
+    // }
+
+    let query = {};
+    if (q) {
+      query = { $text: { $search: q } };
+    }
+
     try {
-      const orders = await Order.find({});
+      const orders = await Order.find(query).populate({ path: 'detail', populate: { path: 'sizeId colorId' } }).sort(sortValue);
+
       if (!orders) {
-        return res.status(404).json({ message: 'No orders found' });
+        return res.status(400).json({ errors: [{ msg: 'No order found' }] });
       }
-      return res.json(orders)
+
+      return res.json({
+        orders: orders.slice(start, end),
+        total: orders.length
+      });
     } catch (error) {
-      return res.status(500).send('Server error!');
+      return res.status(500).send('Server error');
     }
   }
 

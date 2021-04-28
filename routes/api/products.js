@@ -13,9 +13,9 @@ const { validateAddCloth } = require('../../helpers/valid');
 router.get('/', ProductController.getAllProducts);
 
 // @route   GET api/products/admin
-// @desc    Get All Products for admin page with filter and pagination
+// @desc    Get All Products for admin page with search, filter and pagination
 // @access  Public
-router.get('/admin', ProductController.getAllProductsForAdmin);
+router.get('/admin', [auth, checkPermission], ProductController.getAllProductsForAdmin);
 
 // @route   GET api/products/search
 // @desc    Search Products

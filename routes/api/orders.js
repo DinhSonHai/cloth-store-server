@@ -18,7 +18,7 @@ router.get('/', auth, OrderController.getAllUsersOrders);
 router.post('/', [auth, validateOrder], OrderController.order);
 
 // @route   POST api/orders/admin
-// @desc    Get All Orders
+// @desc    Get All Orders for admin with search, filter and pagination
 // @access  Private Admin
 router.get('/admin', [auth, checkPermission], OrderController.getAllOrders);
 
