@@ -1,4 +1,4 @@
-const dayjs = require('dayjs');
+
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
@@ -28,7 +28,7 @@ const ProductSchema = new Schema({
   reviewsCount: { type: Number, default: 0 },
   sold: { type: Number, default: 0 },
   profit: { type: Number, default: 0 },
-  createdAt: { type: Date, default: dayjs().toISOString() }
+  createdAt: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('product', ProductSchema);

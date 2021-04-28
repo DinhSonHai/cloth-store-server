@@ -1,13 +1,12 @@
-const dayjs = require('dayjs');
+
 const mongoose = require('mongoose');
-const { nanoid } = require('nanoid')
 
 const Schema = mongoose.Schema;
 
 const OrderSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'user', require: true },
   orderId: { type: String, require: true },
-  orderedDate: { type: Date, default: dayjs().toISOString() },
+  orderedDate: { type: Date, default: Date.now },
   detail: [
     {
       name: { type: String, require: true, text: true },

@@ -22,6 +22,11 @@ router.get('/admin', auth, AuthController.getAdmin);
 // @access  Private
 router.put('/info', [auth, validateChangeInfo], AuthController.changeInfo);
 
+// @route   PUT api/auth/admin/info
+// @desc    Change admin info
+// @access  Private Admin
+router.put('/admin/info', [auth, checkPermission, validateChangeInfo], AuthController.changeAdminInfo);
+
 // @route   PUT api/auth/forgotpassword
 // @desc    Send mail to user to reset password
 // @access  Public
@@ -36,6 +41,11 @@ router.put('/resetpassword', validateResetPassWord, AuthController.resetPassword
 // @desc    Change user password
 // @access  Private
 router.put('/password', [auth, validateChangePassWord], AuthController.changePassword);
+
+// @route   PUT api/auth/admin/password
+// @desc    Change admin password
+// @access  Private Admin
+router.put('/admin/password', [auth, checkPermission, validateChangePassWord], AuthController.changeAdminPassword);
 
 // @route   POST api/auth/login
 // @desc    Log in customer account

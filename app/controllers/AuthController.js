@@ -50,7 +50,7 @@ class AuthController {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ message: errors.array()[0] });
+      return res.status(400).json({ message: errors.array()[0].msg });
     }
 
     const { name } = req.body;
@@ -72,6 +72,37 @@ class AuthController {
       return res.status(500).send('Server Error');
     }
   }
+
+  // @route   PUT api/auth/admin/info
+  // @desc    Change admin info
+  // @access  Private Admin
+  async changeAdminInfo(req, res) {
+    // Validate request body
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+    }
+
+    const { name } = req.body;
+
+    try {
+      let admin = await Admin.findById(req.user._id);
+
+      if (!admin) {
+        return res.status(404).json({
+          message: 'You can not perform this action'
+        });
+      }
+
+      admin.name = name;
+
+      await admin.save();
+      return res.json({ message: 'Update info success' });
+    } catch (error) {
+      return res.status(500).send('Server Error');
+    }
+  }
+
   // @route   PUT api/auth/forgotpassword
   // @desc    Send mail to user to reset password
   // @access  Public
@@ -79,7 +110,7 @@ class AuthController {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ message: errors.array()[0] });
+      return res.status(400).json({ message: errors.array()[0].msg });
     }
 
     const { email } = req.body;
@@ -153,7 +184,7 @@ class AuthController {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ message: errors.array()[0] });
+      return res.status(400).json({ message: errors.array()[0].msg });
     }
 
     const { password, resetPasswordLink } = req.body;
@@ -205,7 +236,7 @@ class AuthController {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ message: errors.array()[0] });
+      return res.status(400).json({ message: errors.array()[0].msg });
     }
 
     const { currentPassword, newPassword } = req.body;
@@ -240,6 +271,48 @@ class AuthController {
     }
   }
 
+  // @route   PUT api/auth/admin/password
+  // @desc    Change admin password
+  // @access  Private Admin
+  async changeAdminPassword(req, res) {
+    // Validate request body
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+    }
+
+    const { currentPassword, newPassword } = req.body;
+
+    try {
+      let admin = await Admin.findById(req.user._id);
+
+      if (!admin) {
+        return res.status(404).json({
+          message: 'You can not perform this action'
+        });
+      }
+
+      // Check if password match
+      const isMatch = await admin.checkPassWord(currentPassword);
+      if (!isMatch) {
+        return res.status(400).json({
+          message: 'Your password is invalid'
+        })
+      }
+
+      // Encrypt password
+      const salt = await bcrypt.genSalt(10);
+      const password = await bcrypt.hash(newPassword, salt);
+
+      admin.password = password;
+
+      await admin.save();
+      return res.json({ message: 'Update password success' });
+    } catch (error) {
+      return res.status(500).send('Server Error');
+    }
+  }
+
   // @route   POST api/auth/login
   // @desc    Log in customer account
   // @access  Public
@@ -247,7 +320,7 @@ class AuthController {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ error: errors.array()[0] });
+      return res.status(400).json({ error: errors.array()[0].msg });
     }
 
     // Get data from body
@@ -296,7 +369,7 @@ class AuthController {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ message: errors.array()[0] });
+      return res.status(400).json({ message: errors.array()[0].msg });
     }
 
     // Get data from body
@@ -371,7 +444,7 @@ class AuthController {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ message: errors.array()[0] });
+      return res.status(400).json({ message: errors.array()[0].msg });
     }
 
     // Get data from body
