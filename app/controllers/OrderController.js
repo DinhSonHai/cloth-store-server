@@ -4,6 +4,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 const nodemailer = require('nodemailer');
 const { customAlphabet } = require('nanoid');
 const config = require('../../config/default.json');
+const moment = require('moment');
 
 const Order = require('../models/Order');
 const User = require('../models/User');
@@ -198,15 +199,34 @@ class OrderController {
     const limit = parseInt(req.query.limit) || 10;
     const start = (page - 1) * limit;
     const end = page * limit;
+    const from = parseInt(req.query.from);
+    const to = parseInt(req.query.to);
 
     let sortValue = { 'orderedDate': 'desc' };
-    // if (sort === 'profit') {
-    //   sortValue = { 'profit': 'desc' };
-    // }
 
-    let query = {};
-    if (q) {
-      query = { $text: { $search: q } };
+    let dayStart = moment().startOf('day');
+    let dayEnd = moment().endOf('day');
+
+    let query = q ? { $text: { $search: q } } : {};
+
+    if (sort) {
+      if (sort === 'today') {
+        dayStart = new Date(dayStart).toISOString();
+        dayEnd = new Date(dayEnd).toISOString();
+        query = { ...query, 'orderedDate': { $gte: dayStart, $lt: dayEnd } };
+      }
+
+      if (sort === 'yesterday') {
+        dayStart = new Date(moment().subtract(1, 'days').startOf('day')).toISOString();
+        dayEnd = new Date(moment().subtract(1, 'days').endOf('day')).toISOString();
+        query = { ...query, 'orderedDate': { $gte: dayStart, $lt: dayEnd } };
+      }
+    }
+
+    if (from && to) {
+      dayStart = new Date(from).toISOString();
+      dayEnd = new Date(to).toISOString();
+      query = { ...query, 'orderedDate': { $gte: dayStart, $lt: dayEnd } };
     }
 
     try {
