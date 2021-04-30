@@ -67,9 +67,10 @@ class ProductController {
   // @desc    Search Products
   // @access  Public
   async searchProducts(req, res) {
-    const { q, categoryId, sort, size } = req.query;
+    const { q, categoryId, sort } = req.query;
 
     const page = parseInt(req.query.page) || 1;
+
     const limit = 10;
     const start = (page - 1) * limit;
     const end = page * limit;
@@ -86,10 +87,6 @@ class ProductController {
     }
 
     let query = { $text: { $search: q } };
-
-    if (size) {
-      query = { $text: { $search: q }, 'sizes': size };
-    }
 
     try {
       let products = await Product.find(query).populate('categories').sort(sortValue);
@@ -117,6 +114,7 @@ class ProductController {
       if (categoryId) {
         products = products.filter(product => product.categories.find(category => category._id.toString() === categoryId));
       }
+
       return res.json({
         products: products.slice(start, end),
         total: products.length,
@@ -132,9 +130,10 @@ class ProductController {
   // @desc    Get All Products By typeId
   // @access  Public
   async getProductsByType(req, res) {
-    const { categoryId, sort, size } = req.query;
+    const { categoryId, sort } = req.query;
 
     const page = parseInt(req.query.page) || 1;
+
     const limit = 10;
     const start = (page - 1) * limit;
     const end = page * limit;
@@ -155,13 +154,8 @@ class ProductController {
 
     try {
       if (categoryId) {
-        if (size) {
-          query = { 'categories': categoryId, 'sizes': size };
-        }
-        else {
-          // Get products by categoryId
-          query = { 'categories': categoryId };
-        }
+        // Get products by categoryId
+        query = { 'categories': categoryId };
       }
       else {
         // Get products by typeId  
@@ -172,18 +166,14 @@ class ProductController {
 
         const categoryList = categories.map(category => category._id);
 
-        if (size) {
-          query = { 'categories': { $in: categoryList }, 'sizes': size };
-        }
-        else {
-          query = { 'categories': { $in: categoryList } };
-        }
+        query = { 'categories': { $in: categoryList } };
       }
 
       const products = await Product.find(query).sort(sortValue);
       if (!products) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
       }
+
       return res.json({
         products: products.slice(start, end),
         total: products.length
