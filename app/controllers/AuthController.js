@@ -252,6 +252,8 @@ class AuthController {
       if (!user.resetPasswordLink) {
         return res.status(400).json({ message: 'Reset link has been used' });
       }
+
+      return res.json({ message: 'You can now reset your password' });
     } catch (error) {
       return res.status(500).send('Server Error');
     }
