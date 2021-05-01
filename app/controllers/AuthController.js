@@ -234,17 +234,24 @@ class AuthController {
   // @access  Public
   async checkToken(req, res) {
     const token = req.query.token;
+    let userId = '';
 
     try {
       jwt.verify(token, config.forgotPasswordSecret,
         (err, decoded) => {
           if (decoded) {
-            return res.json({ message: 'You can now reset your password' });
+            userId = decoded.user._id;
           }
           if (err) {
             return res.status(401).json({ message: 'Link reset password is invalid or expired' });
           }
         });
+      let user = await User.findById(userId);
+
+      // Check if reset link is used
+      if (!user.resetPasswordLink) {
+        return res.status(400).json({ message: 'Reset link has been used' });
+      }
     } catch (error) {
       return res.status(500).send('Server Error');
     }
