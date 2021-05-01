@@ -149,7 +149,7 @@ class AuthController {
 
       const content = `
         <h1>You have requested reset your password at aware</h1>
-        <h2>Reset your password at: <a href=${config.CLIENT_URL}/auth/resetpassword/${token}>Reset Password</a></h2>
+        <h2>Reset your password at: <a href=${config.CLIENT_URL}/auth/resetpassword?token=${token}>Reset Password</a></h2>
         <h2>Visit aware page: <a href=${config.CLIENT_URL}>Aware</a></h2>
       `;
 
@@ -224,6 +224,27 @@ class AuthController {
       await user.save();
 
       return res.json({ message: 'Your password has been resetted' });
+    } catch (error) {
+      return res.status(500).send('Server Error');
+    }
+  }
+
+  // @route   GET api/auth/resetpassword
+  // @desc    Check if token is invalid or expired
+  // @access  Public
+  async checkToken(req, res) {
+    const token = req.query.token;
+
+    try {
+      jwt.verify(token, config.forgotPasswordSecret,
+        (err, decoded) => {
+          if (decoded) {
+            return res.json({ message: 'You can now reset your password' });
+          }
+          if (err) {
+            return res.status(401).json({ message: 'Link reset password is invalid or expired' });
+          }
+        });
     } catch (error) {
       return res.status(500).send('Server Error');
     }

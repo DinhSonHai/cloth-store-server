@@ -32,6 +32,11 @@ router.put('/admin/info', [auth, checkPermission, validateChangeInfo], AuthContr
 // @access  Public
 router.put('/forgotpassword', validateForgotPassWord, AuthController.forgotPassword);
 
+// @route   GET api/auth/resetpassword
+// @desc    Check if token is invalid or expired
+// @access  Public
+router.get('/resetpassword', AuthController.checkToken);
+
 // @route   PUT api/auth/resetpassword
 // @desc    Reset user's password
 // @access  Public
