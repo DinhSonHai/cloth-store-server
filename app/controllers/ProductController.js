@@ -67,7 +67,27 @@ class ProductController {
   // @desc    Search Products
   // @access  Public
   async searchProducts(req, res) {
-    const { q, categoryId, sort } = req.query;
+    const { q, categoryId, sort, size, color, brand, available } = req.query;
+    const from = parseInt(req.query.from);
+    const to = parseInt(req.query.to);
+
+    let filter = { sizes: size, colors: color, brandId: brand };
+    if (from >= 0 && to >= 0) {
+      filter = { ...filter, price: { $gte: from, $lt: to } };
+    }
+    if (available === 'outofstock') {
+      filter = { ...filter, isActive: false };
+    }
+
+    for (let key in filter) {
+      if (key !== 'isActive') {
+        if (!filter[key]) {
+          delete filter[key];
+        }
+      }
+    }
+
+    console.log(filter);
 
     const page = parseInt(req.query.page) || 1;
 
@@ -86,9 +106,10 @@ class ProductController {
       sortValue = { 'price': 'desc' };
     }
 
-    let query = { $text: { $search: q } };
+    let query = { $text: { $search: q }, ...filter };
 
     try {
+      console.log(query);
       let products = await Product.find(query).populate('categories').sort(sortValue);
       if (!products) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
@@ -130,7 +151,25 @@ class ProductController {
   // @desc    Get All Products By typeId
   // @access  Public
   async getProductsByType(req, res) {
-    const { categoryId, sort } = req.query;
+    const { categoryId, sort, size, color, brand, available } = req.query;
+    const from = parseInt(req.query.from);
+    const to = parseInt(req.query.to);
+
+    let filter = { sizes: size, colors: color, brandId: brand };
+    if (from >= 0 && to >= 0) {
+      filter = { ...filter, price: { $gte: from, $lt: to } };
+    }
+    if (available === 'outofstock') {
+      filter = { ...filter, isActive: false };
+    }
+
+    for (let key in filter) {
+      if (key !== 'isActive') {
+        if (!filter[key]) {
+          delete filter[key];
+        }
+      }
+    }
 
     const page = parseInt(req.query.page) || 1;
 
@@ -150,12 +189,12 @@ class ProductController {
       sortValue = { 'price': 'desc' };
     }
 
-    let query = {};
+    let query = { ...filter };
 
     try {
       if (categoryId) {
         // Get products by categoryId
-        query = { 'categories': categoryId };
+        query = { ...filter, 'categories': categoryId };
       }
       else {
         // Get products by typeId  
@@ -166,8 +205,10 @@ class ProductController {
 
         const categoryList = categories.map(category => category._id);
 
-        query = { 'categories': { $in: categoryList } };
+        query = { ...filter, 'categories': { $in: categoryList } };
       }
+
+      console.log(query);
 
       const products = await Product.find(query).sort(sortValue);
       if (!products) {
