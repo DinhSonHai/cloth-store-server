@@ -5,7 +5,7 @@ const OrderController = require('../../app/controllers/OrderController');
 const auth = require('../../app/middlewares/auth');
 const checkPermission = require('../../app/middlewares/checkPermission');
 
-const { validateOrder } = require('../../helpers/valid');
+const { validateOrder } = require('../../app/middlewares/valid');
 
 // @route   GET api/orders/
 // @desc    Get all users's orders

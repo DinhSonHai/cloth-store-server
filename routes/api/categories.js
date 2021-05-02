@@ -5,7 +5,7 @@ const CategoryController = require('../../app/controllers/CategoryController');
 const auth = require('../../app/middlewares/auth');
 const checkPermission = require('../../app/middlewares/checkPermission');
 
-const { validateAddCategory } = require('../../helpers/valid');
+const { validateAddCategory } = require('../../app/middlewares/valid');
 
 // @route   GET api/categories/
 // @desc    Get All Categories

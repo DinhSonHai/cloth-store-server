@@ -87,7 +87,7 @@ class ProductController {
       }
     }
 
-    console.log(filter);
+    // console.log(filter);
 
     const page = parseInt(req.query.page) || 1;
 
@@ -109,7 +109,7 @@ class ProductController {
     let query = { $text: { $search: q }, ...filter };
 
     try {
-      console.log(query);
+      // console.log(query);
       let products = await Product.find(query).populate('categories').sort(sortValue);
       if (!products) {
         return res.status(400).json({ errors: [{ msg: 'No product found' }] });
@@ -208,7 +208,7 @@ class ProductController {
         query = { ...filter, 'categories': { $in: categoryList } };
       }
 
-      console.log(query);
+      // console.log(query);
 
       const products = await Product.find(query).sort(sortValue);
       if (!products) {

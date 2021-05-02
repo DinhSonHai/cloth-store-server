@@ -5,7 +5,7 @@ const AuthController = require('../../app/controllers/AuthController');
 const auth = require('../../app/middlewares/auth');
 const checkPermission = require('../../app/middlewares/checkPermission');
 
-const { validateSignUp, validateLogIn, validateChangeInfo, validateChangePassWord, validateForgotPassWord, validateResetPassWord } = require('../../helpers/valid');
+const { validateSignUp, validateLogIn, validateChangeInfo, validateChangePassWord, validateForgotPassWord, validateResetPassWord } = require('../../app/middlewares/valid');
 
 // @route   GET api/auth
 // @desc    Get user data

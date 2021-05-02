@@ -5,7 +5,7 @@ const ProductController = require('../../app/controllers/ProductController');
 const auth = require('../../app/middlewares/auth');
 const checkPermission = require('../../app/middlewares/checkPermission');
 
-const { validateAddCloth } = require('../../helpers/valid');
+const { validateAddCloth } = require('../../app/middlewares/valid');
 
 // @route   GET api/products/
 // @desc    Get All Products

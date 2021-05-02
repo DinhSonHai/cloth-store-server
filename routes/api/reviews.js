@@ -5,7 +5,7 @@ const ReviewController = require('../../app/controllers/ReviewController');
 const auth = require('../../app/middlewares/auth');
 const checkPermission = require('../../app/middlewares/checkPermission');
 
-const { validateReview } = require('../../helpers/valid');
+const { validateReview } = require('../../app/middlewares/valid');
 
 // @route   GET api/reviews/:productId/review
 // @desc    Get All Product Review
