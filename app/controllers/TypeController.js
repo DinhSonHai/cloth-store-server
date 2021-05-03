@@ -9,7 +9,7 @@ class TypeController {
     try {
       const types = await Type.find({});
       if (!types) {
-        return res.status(400).json({ errors: [{ msg: 'No type found' }] });
+        return res.status(404).json({ errors: [{ msg: 'No type found' }] });
       }
       return res.json(types);
     } catch (error) {
@@ -24,7 +24,7 @@ class TypeController {
     try {
       const type = await Type.findById(req.params.typeId).populate("collectionId");
       if (!type) {
-        return res.status(400).json({ errors: [{ msg: 'No type found' }] });
+        return res.status(404).json({ errors: [{ msg: 'No type found' }] });
       }
       return res.json(type);
     } catch (error) {

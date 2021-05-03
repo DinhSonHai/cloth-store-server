@@ -14,7 +14,7 @@ class CategoryController {
     try {
       const categories = await Category.find({});
       if (!categories) {
-        return res.status(400).json({ errors: [{ msg: 'No categories found' }] });
+        return res.status(404).json({ errors: [{ msg: 'No categories found' }] });
       }
       return res.json(categories);
     } catch (error) {
@@ -29,7 +29,7 @@ class CategoryController {
     try {
       const categories = await Category.find({ typeId: req.params.typeId });
       if (!categories) {
-        return res.status(400).json({ errors: [{ msg: 'No categories found' }] });
+        return res.status(404).json({ errors: [{ msg: 'No categories found' }] });
       }
       return res.json(categories);
     } catch (error) {
@@ -44,7 +44,7 @@ class CategoryController {
     try {
       const category = await Category.findById(req.params.categoryId);
       if (!category) {
-        return res.status(400).json({ errors: [{ msg: 'No category found' }] });
+        return res.status(404).json({ errors: [{ msg: 'No category found' }] });
       }
       return res.json(category);
     } catch (error) {
@@ -59,7 +59,7 @@ class CategoryController {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(404).json({ errors: errors.array() });
     }
 
     const { categoryName, typeId } = req.body;
@@ -83,7 +83,7 @@ class CategoryController {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(404).json({ errors: errors.array() });
     }
 
     const { categoryName, typeId } = req.body;

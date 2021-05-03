@@ -11,7 +11,7 @@ class CollectionController {
     try {
       const collections = await Collection.find({}).populate('types')
       if (!collections) {
-        return res.status(400).json({ message: 'No collection found' });
+        return res.status(404).json({ message: 'No collection found' });
       }
       return res.json(collections);
     } catch (error) {

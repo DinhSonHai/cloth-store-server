@@ -18,7 +18,7 @@ class ReviewController {
       }).populate('userId');
 
       if (!reviews) {
-        return res.status(400).json({ errors: [{ msg: 'No reviews found' }] });
+        return res.status(404).json({ errors: [{ msg: 'No reviews found' }] });
       }
 
       return res.json(reviews);
@@ -102,7 +102,7 @@ class ReviewController {
 
       const review = await Review.findById(req.params.reviewId).populate('userId');
       if (!review) {
-        return res.status(400).json({ message: 'Review not found' });
+        return res.status(404).json({ message: 'Review not found' });
       }
 
       if (review.productId.toString() !== product._id.toString()) {

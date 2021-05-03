@@ -18,7 +18,7 @@ class OrderController {
     try {
       const orders = await Order.find({ userId: req.user._id }).populate({ path: "detail", populate: { path: "sizeId colorId" } }).sort({ 'orderedDate': 'desc' });
       if (!orders) {
-        return res.status(400).json({ message: 'No order found' });
+        return res.status(404).json({ message: 'No order found' });
       }
       return res.json(orders);
     } catch (error) {
@@ -49,18 +49,18 @@ class OrderController {
 
       const products = await Product.find({ '_id': { $in: productIdList } });
       if (!products) {
-        return res.status(400).json({ message: 'No product found' });
+        return res.status(404).json({ message: 'No product found' });
       }
 
       const user = await User.findById(req.user._id);
       if (!user) {
-        return res.status(400).json({ message: 'User not found' });
+        return res.status(404).json({ message: 'User not found' });
       }
 
       const totalMoney = detail.reduce((total, item) => {
-        const price = products.find(productItem => productItem._id.toString() === item.productId).price;
-        if (price) {
-          total = total + item.quantity * price;
+        const matchProduct = products.find(productItem => productItem._id.toString() === item.productId);
+        if (matchProduct) {
+          total = total + item.quantity * matchProduct.price;
         }
         return total;
       }, 0);
@@ -120,7 +120,7 @@ class OrderController {
           });
         })
         .catch((err) => {
-          return res.status(400).json({
+          return res.status(500).json({
             message: err.message
           });
         });
@@ -177,7 +177,7 @@ class OrderController {
             });
           })
           .catch((err) => {
-            return res.status(400).json({
+            return res.status(500).json({
               message: err.message
             });
           });
@@ -233,7 +233,7 @@ class OrderController {
       const orders = await Order.find(query).populate({ path: 'detail', populate: { path: 'sizeId colorId' } }).sort(sortValue);
 
       if (!orders) {
-        return res.status(400).json({ errors: [{ msg: 'No order found' }] });
+        return res.status(404).json({ errors: [{ msg: 'No order found' }] });
       }
 
       return res.json({

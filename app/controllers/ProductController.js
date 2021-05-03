@@ -18,7 +18,7 @@ class ProductController {
     try {
       const products = await Product.find({});
       if (!products) {
-        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+        return res.status(404).json({ errors: [{ msg: 'No product found' }] });
       }
       return res.json(products);
     } catch (error) {
@@ -51,7 +51,7 @@ class ProductController {
       const products = await Product.find(query).populate('categories').sort(sortValue);
 
       if (!products) {
-        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+        return res.status(404).json({ errors: [{ msg: 'No product found' }] });
       }
 
       return res.json({
@@ -112,7 +112,7 @@ class ProductController {
       // console.log(query);
       let products = await Product.find(query).populate('categories').sort(sortValue);
       if (!products) {
-        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+        return res.status(404).json({ errors: [{ msg: 'No product found' }] });
       }
 
       // Get all categories from products
@@ -200,7 +200,7 @@ class ProductController {
         // Get products by typeId  
         const categories = await Category.find({ typeId: req.params.typeId });
         if (!categories) {
-          return res.status(400).json({ message: 'No category found' });
+          return res.status(404).json({ message: 'No category found' });
         }
 
         const categoryList = categories.map(category => category._id);
@@ -212,7 +212,7 @@ class ProductController {
 
       const products = await Product.find(query).sort(sortValue);
       if (!products) {
-        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+        return res.status(404).json({ errors: [{ msg: 'No product found' }] });
       }
 
       return res.json({
@@ -231,12 +231,12 @@ class ProductController {
     try {
       const product = await Product.findById(req.params.productId);
       if (!product) {
-        return res.status(400).json({ message: 'Product not found' });
+        return res.status(404).json({ message: 'Product not found' });
       }
 
       const products = await Product.find({ brandId: product.brandId, _id: { $ne: product._id } }).limit(4);
       if (!products) {
-        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+        return res.status(404).json({ errors: [{ msg: 'No product found' }] });
       }
 
       return res.json(products);
@@ -254,7 +254,7 @@ class ProductController {
       const products = await Product.find({ '_id': { $in: productIdList } }).populate('sizes colors');
 
       if (!products) {
-        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+        return res.status(404).json({ errors: [{ msg: 'No product found' }] });
       }
 
       return res.json(products);
@@ -270,7 +270,7 @@ class ProductController {
     try {
       const product = await Product.findById(req.params.productId).populate('sizes colors brandId categories').populate({ path: 'reviews', populate: { path: 'userId' } });
       if (!product) {
-        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+        return res.status(404).json({ errors: [{ msg: 'No product found' }] });
       }
       return res.json(product);
     } catch (error) {
@@ -317,7 +317,7 @@ class ProductController {
     try {
       let product = await Product.findById(req.params.productId);
       if (!product) {
-        return res.status(400).json({ errors: [{ msg: 'No product found' }] });
+        return res.status(404).json({ errors: [{ msg: 'No product found' }] });
       }
 
       product = _.extend(product, { photos, name, categories, brandId, price, sizes, colors, quantity, description });

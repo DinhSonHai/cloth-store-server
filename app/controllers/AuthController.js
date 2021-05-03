@@ -168,8 +168,8 @@ class AuthController {
           })
         })
         .catch((err) => {
-          return res.status(400).json({
-            errors: [{ msg: err.message }]
+          return res.status(500).json({
+            message: err.message
           });
         });
     } catch (error) {
@@ -206,12 +206,12 @@ class AuthController {
 
       // Check if reset link is used
       if (!user.resetPasswordLink) {
-        return res.status(400).json({ message: 'Reset link has been used' });
+        return res.status(403).json({ message: 'Reset link has been used' });
       }
 
       // Check if reset password link not match
       if (user.resetPasswordLink !== resetPasswordLink) {
-        return res.status(400).json({ message: 'Invalid reset password link' });
+        return res.status(403).json({ message: 'Invalid reset password link' });
       }
 
       // Encode password
@@ -250,7 +250,7 @@ class AuthController {
 
       // Check if reset link is used
       if (!user.resetPasswordLink) {
-        return res.status(400).json({ message: 'Reset link has been used' });
+        return res.status(403).json({ message: 'Reset link has been used' });
       }
 
       return res.json({ message: 'You can now reset your password' });
@@ -283,7 +283,7 @@ class AuthController {
       // Check if password match
       const isMatch = await user.checkPassWord(currentPassword);
       if (!isMatch) {
-        return res.status(400).json({
+        return res.status(401).json({
           message: 'Your password is invalid'
         })
       }
@@ -325,7 +325,7 @@ class AuthController {
       // Check if password match
       const isMatch = await admin.checkPassWord(currentPassword);
       if (!isMatch) {
-        return res.status(400).json({
+        return res.status(401).json({
           message: 'Your password is invalid'
         })
       }
@@ -360,7 +360,7 @@ class AuthController {
       // Check if user with this email exist
       let user = await User.findOne({ email });
       if (!user) {
-        return res.status(400).json({
+        return res.status(404).json({
           message: 'Your e-mail/password is invalid'
         })
       }
@@ -368,7 +368,7 @@ class AuthController {
       // Check if password match
       const isMatch = await user.checkPassWord(password);
       if (!isMatch) {
-        return res.status(400).json({
+        return res.status(401).json({
           message: 'Your e-mail/password is invalid'
         })
       }
@@ -409,7 +409,7 @@ class AuthController {
       // Check if email exist
       let user = await User.findOne({ email });
       if (user) {
-        return res.status(400).json({ message: 'This email has already signed up' });
+        return res.status(403).json({ message: 'This email has already signed up' });
       }
 
       // Encrypt password
@@ -484,7 +484,7 @@ class AuthController {
       // Check if admin exist
       let admin = await Admin.findOne({ email });
       if (!admin) {
-        return res.status(400).json({
+        return res.status(404).json({
           message: 'Your e-mail/password is invalid'
         })
       }
@@ -492,7 +492,7 @@ class AuthController {
       // Check if password match
       const isMatch = await admin.checkPassWord(password);
       if (!isMatch) {
-        return res.status(400).json({
+        return res.status(401).json({
           message: 'Your e-mail/password is invalid'
         })
       }
