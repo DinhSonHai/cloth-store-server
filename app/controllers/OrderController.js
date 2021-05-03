@@ -300,7 +300,7 @@ class OrderController {
       if (order.status === config.PENDING_ORDER) {
         order.status = config.CANCELED_ORDER;
         await order.save();
-        return res.json({ message: 'Order marked as canceled' });
+        return res.json({ message: 'Order marked as cancelled' });
       }
 
       return res.json({ message: 'Can not perform this action' });
