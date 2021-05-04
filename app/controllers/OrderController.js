@@ -92,7 +92,7 @@ class OrderController {
       const mailOptions = {
         from: config.email,
         to: user.email,
-        subject: 'Order success at aware',
+        subject: 'Order successfully at aware',
         html: content,
       };
 
@@ -116,7 +116,7 @@ class OrderController {
         })
         .then(() => {
           return res.json({
-            message: 'Order success',
+            message: 'Order successfully',
           });
         })
         .catch((err) => {
@@ -173,7 +173,7 @@ class OrderController {
           .sendMail(mailOptions)
           .then(() => {
             return res.json({
-              message: 'Cancel order success',
+              message: 'Cancel order successfully',
             });
           })
           .catch((err) => {
